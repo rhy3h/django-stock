@@ -123,18 +123,18 @@
 							{% for stock in stock_list.positive %}
 							<tr>
 								<th>{{ stock.id }}</th>
-								<th>{{ stock.name }}</th>
-								<th>{{ stock.diff }}</th>
-								<th>
+								<td>{{ stock.name }}</td>
+								<td>{{ stock.diff }}</td>
+								<td>
 								{% for buy in stock.buy_in %}
 								{{ buy }}<br>
 								{% endfor %}
-								</th>
-								<th>
+								</td>
+								<td>
 								{% for sell in stock.sell_out %}
 								{{ sell }}<br>
 								{% endfor %}
-								</th>
+								</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -163,18 +163,18 @@
 							{% for stock in stock_list.negative %}
 							<tr>
 								<th>{{ stock.id }}</th>
-								<th>{{ stock.name }}</th>
-								<th>{{ stock.diff }}</th>
-								<th>
+								<td>{{ stock.name }}</td>
+								<td>{{ stock.diff }}</td>
+								<td>
 								{% for buy in stock.buy_in %}
 								{{ buy }}<br>
 								{% endfor %}
-								</th>
-								<th>
+								</td>
+								<td>
 								{% for sell in stock.sell_out %}
 								{{ sell }}<br>
 								{% endfor %}
-								</th>
+								</td>
 							</tr>
 							{% endfor %}
 						</tbody>
