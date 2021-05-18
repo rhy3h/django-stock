@@ -1,293 +1,343 @@
 {% extends 'base/dashboard.html' %}
 {% block content %}
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <form method="POST" action="" novalidate>
-        {% csrf_token %}
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">{{ group.Name }}
-                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#edit_group">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                    </svg>
-                </button>
-                <a class="btn btn-link" onclick="download_all_table();">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
-                        <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
-                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                    </svg>
-                </a>
-                <script>
-                    function download_all_table(){
-                        begin_date = document.getElementById("begin_date").value;
-                        end_date = document.getElementById("end_date").value;
-                        download_table('positive_table', begin_date, end_date);
-                        download_table('negative_table', begin_date, end_date);
-                    }
-                    function download_table(table_id, begin_date, end_date) {
-                        if(table_id == 'positive_table')
-                            table_name = '買入';
-                        else
-                            table_name = '賣出';
-                        let rows = document.querySelectorAll('table#' + table_id +  ' tr');
-                        let csv = [];
-                        for (let i = 0; i < rows.length; i++) {
-                            let row = [], cols = rows[i].querySelectorAll('th');
-                            for (let j = 0; j < 5; j++) {
-                                row.push('"' + cols[j].innerText + '"');
-                            }
-                            csv.push(row.join(','));
-                        }
-                        let csv_string = csv.join('\n');
-                        // Download it
-                        let filename = '{{ group.Name }}' + ' ' + table_name + ' ' + begin_date + ' ' + end_date + '.csv';
-                        let link = document.createElement('a');
-                        link.style.display = 'none';
-                        link.setAttribute('target', '_blank');
-                        link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent("\uFEFF" + csv_string));
-                        link.setAttribute('download', filename);
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                </script>
-            </h1>
-            
-            <div class="row no-gutters align-items-center">
-                <div class="col-sm-5 col-12 mr-2">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
-                    <input class="form-control" id="begin_date" name="begin_date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}">
-                </div>
-                <div class="col-sm-5 col-12 mr-2">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
-                    <input class="form-control" id="end_date" name="end_date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
-                </div>
-                <div class="col-sm-2 col-12 mr-2">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
-                    <button class="btn btn-primary" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </form>
-    <h3 class="h3">券商清單
-        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#add_broker">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-            </svg>
-        </button>
-        <a class="btn btn-link" target="_blank" href="download">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
-                <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
-                <path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
-            </svg>
-        </a>
-    </h3>
-    <div id="broker_list" class="row">
-        {% for broker in broker_list %}
-        <h6 class="fs-4 col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4 d-flex justify-content-between align-items-center">
-            <span class="fs-5">{{ broker.Name }}</span>
-            <a class="btn btn-link" href="del-broker/{{ broker.id }}">
-                <span data-feather="x"></span>
-            </a>
-        </h6>
-        {% endfor %}
-    </div>
-    <div class="row">
-        <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12 col-12 mb-4">
-            <div class="card">
-                <div class="card-header text-primary">
-                    買入
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered" id="positive_table">
-                        <thead>
-                            <tr>
-                                <th>股票代碼</th>
-                                <th>名稱</th>
-                                <th>差額(仟元)</th>
-                                <th>買進</th>
-                                <th>賣出</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for stock in stock_list.positive %}
-                            <tr>
-                                <th>{{ stock.id }}</th>
-                                <th>{{ stock.name }}</th>
-                                <th>{{ stock.diff }}</th>
-                                <th>
-                                {% for buy in stock.buy_in %}
-                                {{ buy }}<br>
-                                {% endfor %}
-                                </th>
-                                <th>
-                                {% for sell in stock.sell_out %}
-                                {{ sell }}<br>
-                                {% endfor %}
-                                </th>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+	<form method="POST" action="" novalidate>
+		{% csrf_token %}
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">{{ group.Name }}
+				<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#edit_group">
+					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+						<path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+					</svg>
+				</button>
+				<a class="btn btn-link" onclick="download_all_table();">
+					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
+						<path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
+						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+					</svg>
+				</a>
+				
+				<script>
+					function download_all_table(){
+						begin_date = document.getElementById("begin_date").value;
+						end_date = document.getElementById("end_date").value;
+						download_table('positive_table', begin_date, end_date);
+						download_table('negative_table', begin_date, end_date);
+					}
+					function download_table(table_id, begin_date, end_date) {
+						if(table_id == 'positive_table')
+							table_name = '買入';
+						else
+							table_name = '賣出';
+						let rows = document.querySelectorAll('table#' + table_id +  ' tr');
+						let csv = [];
+						for (let i = 0; i < rows.length; i++) {
+							let row = [], cols = rows[i].querySelectorAll('th');
+							for (let j = 0; j < 5; j++) {
+								row.push('"' + cols[j].innerText + '"');
+							}
+							csv.push(row.join(','));
+						}
+						let csv_string = csv.join('\n');
+						// Download it
+						let filename = '{{ group.Name }}' + ' ' + table_name + ' ' + begin_date + ' ' + end_date + '.csv';
+						let link = document.createElement('a');
+						link.style.display = 'none';
+						link.setAttribute('target', '_blank');
+						link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent("\uFEFF" + csv_string));
+						link.setAttribute('download', filename);
+						document.body.appendChild(link);
+						link.click();
+						document.body.removeChild(link);
+					}
+				</script>
+			</h1>
+			
+			<div class="row no-gutters align-items-center">
+				<div class="col-sm-4 col-12 mr-2">
+					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
+					<input class="form-control" id="begin_date" name="begin_date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" disabled>
+				</div>
+				<div class="col-sm-4 col-12 mr-2">
+					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
+					<input class="form-control" id="end_date" name="end_date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
+				</div>
+				<div class="col-sm-2 col-12 mr-2">
+					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">間隔</div>
+					<select class="form-select" id="interval" name="interval">
+						<option disabled>請選擇</option>
+						{% for days in interval_days %}
+							{% if interval == forloop.counter0 %}
+								<option value="{{ days }}" selected>{{ days }}</option>
+							{% else%}
+								<option value="{{ days }}">{{ days }}</option>
+							{% endif %}
+						{% endfor %}
+					</select>
+				</div>
+				<div class="col-sm-2 col-12 mr-2">
+					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
+					<button class="btn btn-primary" type="submit">
+						<i class="bi bi-search"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+	<h3 class="h3">券商清單
+		<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#add_broker">
+			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+				<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+				<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+			</svg>
+		</button>
+		<a class="btn btn-link" target="_blank" href="download">
+			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
+				<path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
+				<path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
+			</svg>
+		</a>
+		<a class="btn btn-link"data-bs-toggle="modal" data-bs-target="#upload">
+			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
+				<path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>
+			</svg>
+		</a>
+	</h3>
+	<div id="broker_list" class="row">
+		{% for broker in broker_list %}
+		<h6 class="fs-4 col-xxl-2 col-xl-3 col-lg-4 col-sm-6 mb-4 d-flex justify-content-between align-items-center">
+			<span class="fs-5">{{ broker.Name }}</span>
+			<a class="btn btn-link" href="del-broker/{{ broker.id }}">
+				<span data-feather="x"></span>
+			</a>
+		</h6>
+		{% endfor %}
+	</div>
+	<div class="row">
+		<div class="col-xl-6 col-lg-12 col-md-12 col-sm-12 col-12 mb-4">
+			<div class="card">
+				<div class="card-header text-primary">
+					買入
+				</div>
+				<div class="card-body">
+					<table class="table table-bordered" id="positive_table">
+						<thead>
+							<tr>
+								<th>股票代碼</th>
+								<th>名稱</th>
+								<th>差額(仟元)</th>
+								<th>買進</th>
+								<th>賣出</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for stock in stock_list.positive %}
+							<tr>
+								<th>{{ stock.id }}</th>
+								<th>{{ stock.name }}</th>
+								<th>{{ stock.diff }}</th>
+								<th>
+								{% for buy in stock.buy_in %}
+								{{ buy }}<br>
+								{% endfor %}
+								</th>
+								<th>
+								{% for sell in stock.sell_out %}
+								{{ sell }}<br>
+								{% endfor %}
+								</th>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
-        <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12 col-12 mb-4">
-            <div class="card">
-                <div class="card-header text-primary">
-                      賣出
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered" id="negative_table">
-                        <thead>
-                            <tr>
-                                <th>股票代碼</th>
-                                <th>名稱</th>
-                                <th>差額(仟元)</th>
-                                <th>買進</th>
-                                <th>賣出</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for stock in stock_list.negative %}
-                            <tr>
-                                <th>{{ stock.id }}</th>
-                                <th>{{ stock.name }}</th>
-                                <th>{{ stock.diff }}</th>
-                                <th>
-                                {% for buy in stock.buy_in %}
-                                {{ buy }}<br>
-                                {% endfor %}
-                                </th>
-                                <th>
-                                {% for sell in stock.sell_out %}
-                                {{ sell }}<br>
-                                {% endfor %}
-                                </th>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="col-xl-6 col-lg-12 col-md-12 col-sm-12 col-12 mb-4">
+			<div class="card">
+				<div class="card-header text-primary">
+					  賣出
+				</div>
+				<div class="card-body">
+					<table class="table table-bordered" id="negative_table">
+						<thead>
+							<tr>
+								<th>股票代碼</th>
+								<th>名稱</th>
+								<th>差額(仟元)</th>
+								<th>買進</th>
+								<th>賣出</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for stock in stock_list.negative %}
+							<tr>
+								<th>{{ stock.id }}</th>
+								<th>{{ stock.name }}</th>
+								<th>{{ stock.diff }}</th>
+								<th>
+								{% for buy in stock.buy_in %}
+								{{ buy }}<br>
+								{% endfor %}
+								</th>
+								<th>
+								{% for sell in stock.sell_out %}
+								{{ sell }}<br>
+								{% endfor %}
+								</th>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
 </main>
 {% endblock content %}
 
 {% block modal %}
 <div class="modal fade" id="new_group" tabindex="-1" aria-labelledby="new_group" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">新增群組</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="needs-validation" method="POST" action="/group/create/" novalidate>
-                {% csrf_token %}
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="group_name" name="group_name" placeholder="群組名稱" required>
-                        <label for="group_name">群組名稱</label>
-                    </div>
-                    <button class="" type="submit" id="add_group_submit" hidden>Continue to checkout</button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="document.getElementById('add_group_submit').click()">新增</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="/group/create/" novalidate>
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="group_name" name="group_name" placeholder="群組名稱" required>
+						<label for="group_name">群組名稱</label>
+					</div>
+					<button class="" type="submit" id="add_group_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onclick="document.getElementById('add_group_submit').click()">新增</button>
+			</div>
+		</div>
+	</div>
 </div>
 <div class="modal fade" id="edit_group" tabindex="-1" aria-labelledby="edit_group" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">編輯群組</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="needs-validation" method="POST" action="edit" novalidate>
-                {% csrf_token %}
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="new_group_name" name="new_group_name" placeholder="新名稱" required>
-                        <label for="new_group_name">新名稱</label>
-                    </div>
-                    <button class="" type="submit" id="edit_group_submit" hidden>Continue to checkout</button>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <a href="delete" class="btn btn-outline-danger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                    </svg>
-                </a>
-                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('edit_group_submit').click()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">編輯群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="edit" novalidate>
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="new_group_name" name="new_group_name" placeholder="新名稱" required>
+						<label for="new_group_name">新名稱</label>
+					</div>
+					<button class="" type="submit" id="edit_group_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer justify-content-between">
+				<a href="delete" class="btn btn-outline-danger">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+						<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+						<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+					</svg>
+				</a>
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('edit_group_submit').click()">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+						<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+						<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="upload" tabindex="-1" aria-labelledby="upload" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">上傳券商</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form enctype="multipart/form-data"  class="needs-validation" method="POST" action="upload" novalidate>
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<div class="mb-3">
+							<label for="upload" class="form-label" >上傳檔案</label>
+							<input class="form-control" type="file" accept=".csv" id="uploadfile" name="uploadfile">
+						  </div>
+					</div>
+					<button type="submit" id="upload_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('upload_submit').click()">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+						<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+						<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 <div class="modal fade" id="add_broker" tabindex="-1" aria-labelledby="add_broker" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">新增券商</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="needs-validation" method="POST" action="add-broker/" id="add_broker_form" novalidate>
-                {% csrf_token %}
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="input-group mb-3">
-                                <input id="input_broker" type="text" class="form-control" placeholder="券商" aria-label="Stock" aria-describedby="basic-addon1">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="input-group mb-3">
-                                <input id="input_branch" type="text" class="form-control" placeholder="分部" aria-label="Stock" aria-describedby="basic-addon1">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <select class="form-select mb-3" id="select_broker" name="select_broker" onchange="generate_branch_list()">
-                                <script>
-                                    generate_broker_list();
-                                </script>
-                            </select>
-                        </div>
-                        <div class="col-sm-6">
-                            <select class="form-select mb-3" id="select_branch" name="select_branch">
-                                <script>
-                                    generate_branch_list();
-                                </script>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="" type="submit" id="add_broker_submit" hidden>Continue to checkout</button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add_broker_submit').click()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增券商</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="add-broker/" id="add_broker_form" novalidate>
+				{% csrf_token %}
+					<div class="row">
+						<div class="col-sm-6">
+							<div class="input-group mb-3">
+								<input id="input_broker" type="text" class="form-control" placeholder="券商" aria-label="Stock" aria-describedby="basic-addon1">
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="input-group mb-3">
+								<input id="input_branch" type="text" class="form-control" placeholder="分部" aria-label="Stock" aria-describedby="basic-addon1">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-6">
+							<select class="form-select mb-3" id="select_broker" name="select_broker" onchange="generate_branch_list()">
+								<script>
+									generate_broker_list();
+								</script>
+							</select>
+						</div>
+						<div class="col-sm-6">
+							<select class="form-select mb-3" id="select_branch" name="select_branch">
+								<script>
+									generate_branch_list();
+								</script>
+							</select>
+						</div>
+					</div>
+					<button class="" type="submit" id="add_broker_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add_broker_submit').click()">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+						<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+						<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock modal %}
 

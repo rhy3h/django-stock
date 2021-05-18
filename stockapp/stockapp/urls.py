@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
 from django.contrib.auth.views import LoginView
-from . import views, apis
+from . import views, apis, accounts
 from .cover import cover
 from .group import group
 from .stock import stock
@@ -39,6 +39,7 @@ urlpatterns = [
     path('group/<int:group_id>/edit', group.edit),
     path('group/<int:group_id>/delete', group.delete),
     path('group/<int:group_id>/download', group.download),
+    path('group/<int:group_id>/upload', group.upload),
     path('group/<int:group_id>/add-broker/', group.add_broker),
     path('group/<int:group_id>/del-broker/<int:broker_id>', group.del_broker),
 
@@ -47,7 +48,7 @@ urlpatterns = [
     path('stock/<str:code>/financial-statements', stock.financial_statements),
     path('stock/<str:code>/financial-statements-api', stock.financial_statements_api),
 
-    path('accounts/register/', views.register, name='register'),
-    url('^accounts/login', LoginView.as_view()),
-    url('^accounts/logout', views.logout),
+    path('accounts/sign-up/', accounts.sign_up, name='sign_up'),
+    path('accounts/sign-in/', accounts.sign_in, name='sign_in'),
+    url('^accounts/logout', accounts.logout),
 ]

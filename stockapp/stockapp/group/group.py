@@ -34,22 +34,23 @@ def base(request):
 def index(request, group_id):
     User = request.user
     group_list = Group.objects.filter(Owner=User)
-    group = Group.objects.get(id = group_id)
+    group = group_list.get(id = group_id)
     
     title = '群組 ' + group.Name
     broker_list = Broker.objects.filter(Group = group)
     today = date.today().strftime("%Y-%m-%d")
     begin_date = today
     end_date = today
+    interval = None
+    interval_days = ['0', '1', '2', '3']
 
     if request.method == 'POST':
-        if request.POST.get('begin_date') != '' or request.POST.get('end_date') != '':
-            begin_date = request.POST.get('begin_date')
+        if request.POST.get('end_date') != '':
             end_date = request.POST.get('end_date')
-            if begin_date > end_date:
-                begin_date, end_date = end_date, begin_date
-            if begin_date == '':
-                begin_date = end_date
+            begin_date = end_date
+            if request.POST.get('interval'):
+                interval = int(request.POST.get('interval'))
+                begin_date = (datetime.strptime(end_date, '%Y-%m-%d') - timedelta(days = interval)).strftime('%Y-%m-%d')
         broker_branch = []
         for broker in broker_list:
             broker_branch.append([broker.Broker, broker.Branch])
@@ -68,7 +69,7 @@ def create(request):
         User = request.user
         Group.objects.get_or_create(Owner = User,
                                 Name = group_name)
-        group = Group.objects.last()
+        group = Group.objects.filter(Owner=User).last()
 
         return redirect('/group/' + str(group.id))
 
@@ -132,3 +133,20 @@ def download(request, group_id):
         writer.writerow([broker.Name,broker.Broker, broker.Branch])
 
     return response
+
+@login_required
+def upload(request, group_id):
+    User = request.user
+    group = Group.objects.filter(Owner = User).get(id = group_id)
+    
+    if request.method == "POST":
+        uploadfile = request.FILES['uploadfile']
+        for line in uploadfile:
+            string = line.decode("utf-8-sig")
+            name = string.split(',')[0].replace("\r\n","")
+            broker_branch = get_branch(name)
+            Broker.objects.get_or_create(Group = group,
+                                Name = name,
+                                Broker = broker_branch[0],
+                                Branch = broker_branch[1])
+    return redirect('/group/' + str(group_id))

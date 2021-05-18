@@ -8,6 +8,16 @@ class Branch:
 		self.id = id
 		self.name = name
 
+def get_branch(name):
+	for item in g_BrokerList.split(';'):
+		if item.find(name) != -1:
+			broker_id = item.split(',')[0]
+			for i in item.split(',')[2:]:
+				if i.find(name) != -1:
+					branch_id = i.split('!')[1]
+	
+	return [broker_id, branch_id]
+
 def get_id_name(broker_id):
 	find_index = g_BrokerList.find(broker_id) + len(broker_id) + 1
 	find_colon_index = g_BrokerList[find_index:].find(';')

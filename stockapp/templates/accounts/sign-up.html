@@ -7,7 +7,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
 		<meta name="generator" content="Hugo 0.83.1">
-		<title>股票</title>
+		<title>註冊</title>
 		<link rel="icon" href="{% static 'img/dollar.svg'%}">
 
 		<link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/jumbotron/">
@@ -27,7 +27,10 @@
 				.bd-placeholder-img-lg {
 				font-size: 3.5rem;
 				}
-		}
+			}
+			ul li{
+				list-style-type:none;
+			}
 		</style>
 
 	</head>
@@ -46,29 +49,33 @@
 						<img class="mb-4" src="{% static 'img/dollar.svg'%}" alt="" width="72" height="57">
 					</div>
 					<div class="col-md-6 container-fluid py-1">
-						<form method="POST" action="/accounts/login">
+						<form method="POST" action="">
 							{% csrf_token %}
 							<div class="form-floating mb-3">
-								<input type="text" class="form-control" name="username" placeholder="帳號">
+								{{ form.username }}
 								<label for="username">帳號</label>
+								{{ form.username.errors }}
+							</div>
+
+							<div class="form-floating mb-3">
+								{{ form.email }}
+								<label for="email">電子信箱</label>
+								{{ form.email.errors }}
 							</div>
 						   
 							<div class="form-floating mb-3">
-								<input type="password" class="form-control" name="password" placeholder="密碼">
-								<label for="password">密碼</label>
+								{{ form.password1 }}
+								<label for="password1">密碼</label>
+								{{ form.password1.errors }}
 							</div>
-							{% if form.errors %}
-							<p style="color:red">帳號或密碼錯誤</p>
-							{% endif %}
-							<button class="w-100 btn btn-lg btn-primary" type="submit">登入</button>
+
+							<div class="form-floating mb-3">
+								{{ form.password2 }}
+								<label for="password2">確認密碼</label>
+								{{ form.password2.errors }}
+							</div>
+							<button class="w-100 btn btn-lg btn-primary" type="submit">註冊</button>
 						</form>
-					</div>
-				</div>
-				<div class="p-1 mb-4 bg-light rounded-1">
-					<div class="col-md-6 container-fluid py-1">
-						<h4 class="display-12 fw-bold">沒有帳號嗎？
-							<a href="/accounts/register/" class="link-primary">註冊</a>
-						</h4>
 					</div>
 				</div>
 
