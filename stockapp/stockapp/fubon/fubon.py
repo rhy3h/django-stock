@@ -12,9 +12,10 @@ def get_branch(name):
 	for item in g_BrokerList.split(';'):
 		if item.find(name) > -1:
 			broker_id = item.split('!')[0].split(',')[0]
-			for branch in item.split(',')[1:]:
+			for branch in item.split('!')[1:]:
 				if branch.find(name) > -1:
 					branch_id = branch.split('!')[0]
+			break
 	
 	return [broker_id, branch_id]
 

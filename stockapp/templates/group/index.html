@@ -1,5 +1,6 @@
 {% extends 'base/dashboard.html' %}
 {% block content %}
+{% if group_id %}
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 	<form method="POST" action="" novalidate>
 		{% csrf_token %}
@@ -11,10 +12,10 @@
 					</svg>
 				</button>
 				<a class="btn btn-link" onclick="download_all_table();">
-					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
-						<path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
+					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+						<path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
 						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-					</svg>
+					  </svg>
 				</a>
 				
 				<script>
@@ -54,26 +55,13 @@
 			</h1>
 			
 			<div class="row no-gutters align-items-center">
-				<div class="col-sm-4 col-12 mr-2">
+				<div class="col-sm-5 col-12 mr-2">
 					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
-					<input class="form-control" id="begin_date" name="begin_date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" disabled>
+					<input class="form-control" id="begin_date" name="begin_date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}">
 				</div>
-				<div class="col-sm-4 col-12 mr-2">
+				<div class="col-sm-5 col-12 mr-2">
 					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
 					<input class="form-control" id="end_date" name="end_date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
-				</div>
-				<div class="col-sm-2 col-12 mr-2">
-					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">間隔</div>
-					<select class="form-select" id="interval" name="interval">
-						<option disabled>請選擇</option>
-						{% for days in interval_days %}
-							{% if interval == forloop.counter0 %}
-								<option value="{{ days }}" selected>{{ days }}</option>
-							{% else%}
-								<option value="{{ days }}">{{ days }}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
 				</div>
 				<div class="col-sm-2 col-12 mr-2">
 					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
@@ -196,7 +184,9 @@
 		</div>
 	</div>
 </main>
+{% endif %}
 {% endblock content %}
+
 
 {% block modal %}
 <div class="modal fade" id="new_group" tabindex="-1" aria-labelledby="new_group" aria-hidden="true">

@@ -41,16 +41,15 @@ def index(request, group_id):
     today = date.today().strftime("%Y-%m-%d")
     begin_date = today
     end_date = today
-    interval = None
-    interval_days = ['0', '1', '2', '3']
 
     if request.method == 'POST':
         if request.POST.get('end_date') != '':
+            begin_date = request.POST.get('begin_date')
             end_date = request.POST.get('end_date')
-            begin_date = end_date
-            if request.POST.get('interval'):
-                interval = int(request.POST.get('interval'))
-                begin_date = (datetime.strptime(end_date, '%Y-%m-%d') - timedelta(days = interval)).strftime('%Y-%m-%d')
+            if begin_date > end_date:
+                begin_date, end_date = end_date, begin_date
+            if begin_date == '':
+                begin_date = end_date
         broker_branch = []
         for broker in broker_list:
             broker_branch.append([broker.Broker, broker.Branch])
