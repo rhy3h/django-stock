@@ -25,9 +25,9 @@ except:
     pass
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 LOGIN_REDIRECT_URL = "/group"
 
@@ -117,6 +117,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_URL = '/accounts/sign-in'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/

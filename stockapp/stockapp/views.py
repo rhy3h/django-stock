@@ -15,4 +15,4 @@ def register(request):
 
 def logout(request):
     auth.logout(request)
-    return redirect('/accounts/login')
+    return redirect('/accounts/sign-in')
