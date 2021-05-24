@@ -34,7 +34,7 @@
 						let csv = [];
 						for (let i = 0; i < rows.length; i++) {
 							let row = [], cols = rows[i].querySelectorAll('th');
-							for (let j = 0; j < 5; j++) {
+							for (let j = 0; j < 3; j++) {
 								row.push('"' + cols[j].innerText + '"');
 							}
 							csv.push(row.join(','));
@@ -123,18 +123,18 @@
 							{% for stock in stock_list.positive %}
 							<tr>
 								<th>{{ stock.id }}</th>
-								<td>{{ stock.name }}</td>
-								<td>{{ stock.diff }}</td>
-								<td>
+								<th>{{ stock.name }}</th>
+								<th>{{ stock.diff }}</th>
+								<th>
 								{% for buy in stock.buy_in %}
 								{{ buy }}<br>
 								{% endfor %}
-								</td>
-								<td>
+								</th>
+								<th>
 								{% for sell in stock.sell_out %}
 								{{ sell }}<br>
 								{% endfor %}
-								</td>
+								</th>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -163,18 +163,18 @@
 							{% for stock in stock_list.negative %}
 							<tr>
 								<th>{{ stock.id }}</th>
-								<td>{{ stock.name }}</td>
-								<td>{{ stock.diff }}</td>
-								<td>
+								<th>{{ stock.name }}</th>
+								<th>{{ stock.diff }}</th>
+								<th>
 								{% for buy in stock.buy_in %}
 								{{ buy }}<br>
 								{% endfor %}
-								</td>
-								<td>
+								</th>
+								<th>
 								{% for sell in stock.sell_out %}
 								{{ sell }}<br>
 								{% endfor %}
-								</td>
+								</th>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -333,7 +333,7 @@
 
 {% block script %}
 <script>
-$('#input_broker').on('keydown',function(e){
+		$('#input_broker').on('keydown',function(e){
 			if(e.keyCode == 13) {
 				input_broker_text = document.getElementById('input_broker').value
 				if(input_broker_text.length > 0){
@@ -347,7 +347,7 @@ $('#input_broker').on('keydown',function(e){
 						}
 					}
 				}
-				event.preventDefault();
+				event.preventhefault();
 				return false;
 			}
 		});
@@ -364,7 +364,7 @@ $('#input_broker').on('keydown',function(e){
 						}
 					}
 				}
-				event.preventDefault();
+				event.preventhefault();
 				return false;
 			}
 		});
