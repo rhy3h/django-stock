@@ -27,7 +27,8 @@ def base(request):
     with open('stockapp/static/js/stock.csv', newline='', encoding='utf-8-sig') as f:
         reader = csv.reader(f)
         stocks = list(reader)
-    
+    wantgoo = wantgoo_new('2330')
+    print(wantgoo)
     return render(request, 'group/index.html', locals())
 
 @login_required
@@ -54,7 +55,7 @@ def index(request, group_id):
         for broker in broker_list:
             broker_branch.append([broker.Broker, broker.Branch])
         stock_list = fubon_get_list(broker_branch, begin_date, end_date)
-    
+        
     with open('stockapp/static/js/stock.csv', newline='', encoding='utf-8-sig') as f:
         reader = csv.reader(f)
         stocks = list(reader)

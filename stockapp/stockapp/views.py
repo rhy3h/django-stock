@@ -16,3 +16,6 @@ def register(request):
 def logout(request):
     auth.logout(request)
     return redirect('/accounts/sign-in')
+
+def header(request):
+    return render(request, 'views/header.html', locals())

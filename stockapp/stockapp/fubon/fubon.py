@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 from .fubon_list import *
+from ..apis import *
 from bs4 import BeautifulSoup
 
 class Branch:
@@ -90,15 +91,19 @@ def merge_list(stock_list):
 	data = {'positive':[], 'negative':[]}
 
 	for positive in stock_list['positive']:
-		temp = {
-			'id': None,
-			'name': None,
-			'diff': None,
-			'buy_in': "",
-			'sell_out': "",
-		}
 		for negative in stock_list['negative']:
 			if positive['id'] == negative['id']:
+				wantgoo = wantgoo_new(positive['id'])
+				temp = {
+					'id': None,
+					'name': None,
+					'diff': None,
+					'buy_in': "",
+					'sell_out': "",
+					'sumForeign': wantgoo['sumForeign'],
+					'sumING': wantgoo['sumING'],
+					'sumDealer': wantgoo['sumDealer'],
+				}
 				temp['id'] = positive['id']
 				temp['name'] = positive['name']
 				temp['diff'] = positive['diff'] + negative['diff']
@@ -116,24 +121,33 @@ def merge_list(stock_list):
 	
 	for positive in stock_list['positive']:
 		if positive['id'] != None:
+			wantgoo = wantgoo_new(positive['id'])
 			temp = {
 				'id': positive['id'],
 				'name': positive['name'],
 				'diff': positive['diff'],
 				'buy_in': positive['branch'],
 				'sell_out': None,
+				'sumForeign': wantgoo['sumForeign'],
+				'sumING': wantgoo['sumING'],
+				'sumDealer': wantgoo['sumDealer'],
 			}
 			data['positive'].append(temp)
 	
 	for negative in stock_list['negative']:
 		if negative['id'] != None:
+			wantgoo = wantgoo_new(negative['id'])
 			temp = {
 				'id': negative['id'],
 				'name': negative['name'],
 				'diff': negative['diff'],
 				'buy_in': None,
 				'sell_out': negative['branch'],
+				'sumForeign': wantgoo['sumForeign'],
+				'sumING': wantgoo['sumING'],
+				'sumDealer': wantgoo['sumDealer'],
 			}
+			
 			data['negative'].append(temp)
 	
 	return data

@@ -33,6 +33,8 @@ urlpatterns = [
 
     path('apis/wantgoo/query', apis.wantgoo),
 
+    path('header/', views.header),
+
     path('group/', group.base),
     path('group/create/', group.create),
     path('group/<int:group_id>/', group.index),
