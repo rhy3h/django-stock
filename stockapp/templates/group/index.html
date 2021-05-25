@@ -122,7 +122,7 @@
 						<tbody>
 							{% for stock in stock_list.positive %}
 							<tr>
-								<th>{{ stock.id }}</th>
+								<th><a href="javascript:SearchWantGoo({{ stock.id }})">{{ stock.id }}</a></th>
 								<th>{{ stock.name }}</th>
 								<th>{{ stock.diff }}</th>
 								<th>
@@ -162,7 +162,7 @@
 						<tbody>
 							{% for stock in stock_list.negative %}
 							<tr>
-								<th>{{ stock.id }}</th>
+								<th><a href="javascript:SearchWantGoo({{ stock.id }})">{{ stock.id }}</a></th>
 								<th>{{ stock.name }}</th>
 								<th>{{ stock.diff }}</th>
 								<th>
@@ -329,44 +329,164 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="SearchWantGoo" tabindex="-1" aria-labelledby="SearchWantGoo" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="GoodInfoText">玩股網</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table id="GoodInfoTable" class="table table-striped">
+					<thead>
+						<tr>
+							<th>日期</th>
+							<th>外資</th>
+							<th>投信</th>
+							<th>自營商</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
 {% endblock modal %}
 
 {% block script %}
 <script>
-		$('#input_broker').on('keydown',function(e){
-			if(e.keyCode == 13) {
-				input_broker_text = document.getElementById('input_broker').value
-				if(input_broker_text.length > 0){
-					select_broker = document.getElementById("select_broker");
-					
-					for (i = 0; i < select_broker.length; i++) {
-						if(select_broker.options[i].text.search(input_broker_text) >= 0){
-							document.getElementById("select_broker").selectedIndex = i;
-							generate_branch_list();
-							break;
-						}
+	$('#input_broker').on('keydown',function(e){
+		if(e.keyCode == 13) {
+			input_broker_text = document.getElementById('input_broker').value
+			if(input_broker_text.length > 0){
+				select_broker = document.getElementById("select_broker");
+				
+				for (i = 0; i < select_broker.length; i++) {
+					if(select_broker.options[i].text.search(input_broker_text) >= 0){
+						document.getElementById("select_broker").selectedIndex = i;
+						generate_branch_list();
+						break;
 					}
 				}
-				event.preventhefault();
-				return false;
 			}
-		});
-		$('#input_branch').on('keydown',function(e){
-			if(e.keyCode == 13) {
-				input_branch_text = document.getElementById('input_branch').value
-				if(input_branch_text.length > 0){
-					select_branch = document.getElementById("select_branch");
-					
-					for (i = 0; i < select_branch.length; i++) {
-						if(select_branch.options[i].text.search(input_branch_text) >= 0){
-							document.getElementById("select_branch").selectedIndex = i;
-							break;
-						}
+			event.preventhefault();
+			return false;
+		}
+	});
+	$('#input_branch').on('keydown',function(e){
+		if(e.keyCode == 13) {
+			input_branch_text = document.getElementById('input_branch').value
+			if(input_branch_text.length > 0){
+				select_branch = document.getElementById("select_branch");
+				
+				for (i = 0; i < select_branch.length; i++) {
+					if(select_branch.options[i].text.search(input_branch_text) >= 0){
+						document.getElementById("select_branch").selectedIndex = i;
+						break;
 					}
 				}
-				event.preventhefault();
-				return false;
+			}
+			event.preventhefault();
+			return false;
+		}
+	});
+	function SearchWantGoo(stock_id){
+		console.log(stock_id)
+		$.ajax({
+			url: '/apis/wantgoo/query',
+			data: {
+				"stock_id": stock_id
+			},
+			dataType: 'json',
+			success: function (data) {
+				$("#GoodInfoTable tbody").empty();
+
+				let buy_Foreign = -1,
+					sell_Foreign = -1,
+					buy_ING = -1,
+					sell_ING = -1,
+					buy_Dealer = -1,
+					sell_Dealer = -1;
+				
+				for(let i = 0; i < data.length; i++){
+					if(buy_Foreign == -1 && data[i].sumForeign <= 0){
+						buy_Foreign = i;
+					}
+					if(sell_Foreign == -1 && data[i].sumForeign >= 0){
+						sell_Foreign = i;
+					}
+					if(buy_ING == -1 && data[i].sumING <= 0){
+						buy_ING = i;
+					}
+					if(sell_ING == -1 && data[i].sumING >= 0){
+						sell_ING = i;
+					}
+					if(buy_Dealer == -1 && data[i].sumDealer <= 0){
+						buy_Dealer = i;
+					}
+					if(sell_Dealer == -1 && data[i].sumDealer >= 0){
+						sell_Dealer = i;
+					}
+					
+					text =
+						"<tr>" + 
+						"<th>" + data[i].date + "</th>" + 
+						"<th>" + data[i].sumForeign + "</th>" + 
+						"<th>" + data[i].sumING + "</th>" + 
+						"<th>" + data[i].sumDealer + "</th>" + 
+					"</tr>";
+					
+					$("#GoodInfoTable tbody").append(
+						text
+					);
+				}
+				if(buy_Foreign > sell_Foreign)
+					Foreign = buy_Foreign;
+				else
+					Foreign = -sell_Foreign;
+				
+				if(Foreign == 0 && data[0].sumForeign != 0)
+					Foreign = 10;
+
+				if(buy_ING > sell_ING)
+					ING = buy_ING;
+				else
+					ING = -sell_ING;
+				if(ING == 0 && data[0].sumING != 0)
+					ING = 10;
+				
+				if(buy_Dealer > sell_Dealer)
+					Dealer = buy_Dealer;
+				else
+					Dealer = -sell_Dealer;
+				if(Dealer == 0 && data[0].sumDealer != 0)
+					Dealer = 10;
+				text =
+				"<tr>" + 
+					"<th>" + "天數" + "</th>" + 
+					"<th>" + Foreign + " 天" + "</th>" + 
+					"<th>" + ING + " 天"+ "</th>" + 
+					"<th>" + Dealer + " 天"+ "</th>" + 
+				"</tr>";
+				$('#GoodInfoTable tbody').prepend(text);
+				
+				$("#GoodInfoTable th").each(function () 
+				{
+					if( Number($(this).text()) > 0){
+						$(this).css("color", "red");
+					}
+					else if(Number($(this).text()) < 0){
+						$(this).css("color", "green");
+					}
+				});
+				$("#GoodInfoText").text(stock_id)
+				$('#SearchWantGoo').modal('show')
 			}
 		});
+	}
 </script>
 {% endblock script %}
