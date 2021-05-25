@@ -60,35 +60,42 @@ def wantgoo_new(stock_id):
             sumING = resource_page.json()[i]['sumING']
             sumDealer = resource_page.json()[i]['sumDealerBySelf'] + resource_page.json()[i]['sumDealerHedging']
 
-            if positiveForeign == -1 and sumForeign < 0:
+            if positiveForeign == -1 and sumForeign <= 0:
                 positiveForeign = i
-            if negativeForeign == -1 and sumForeign > 0:
+            if negativeForeign == -1 and sumForeign >= 0:
                 negativeForeign = i
             
-            if positiveING == -1 and sumING < 0:
+            if positiveING == -1 and sumING <= 0:
                 positiveING = i
-            if negativeING == -1 and sumING > 0:
+            if negativeING == -1 and sumING >= 0:
                 negativeING = i
             
-            if positiveDealer == -1 and sumDealer < 0:
+            if positiveDealer == -1 and sumDealer <= 0:
                 positiveDealer = i
-            if negativeDealer == -1 and sumDealer > 0:
+            if negativeDealer == -1 and sumDealer >= 0:
                 negativeDealer = i
         
         if positiveForeign > negativeForeign:
             data['sumForeign'] = positiveForeign
         else:
             data['sumForeign'] = -negativeForeign
+        if data['sumForeign'] == 0 and resource_page.json()[0]['sumForeignWithDealer'] + resource_page.json()[0]['sumForeignNoDealer'] != 0:
+            data['sumForeign'] = 10
         
         if positiveING > negativeING:
             data['sumING'] = positiveING
         else:
             data['sumING'] = -negativeING
+        if data['sumING'] == 0 and resource_page.json()[0]['sumING'] != 0:
+            data['sumING'] = 10
         
         if positiveDealer > negativeDealer:
             data['sumDealer'] = positiveDealer
         else:
             data['sumDealer'] = -negativeDealer
+        if data['sumDealer'] == 0 and resource_page.json()[0]['sumDealerBySelf'] + resource_page.json()[0]['sumDealerHedging'] != 0:
+            data['sumDealer'] = 10
+        
     except:
         pass
 
