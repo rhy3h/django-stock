@@ -27,8 +27,7 @@ def base(request):
     with open('stockapp/static/js/stock.csv', newline='', encoding='utf-8-sig') as f:
         reader = csv.reader(f)
         stocks = list(reader)
-    wantgoo = wantgoo_new('2330')
-    print(wantgoo)
+    
     return render(request, 'group/index.html', locals())
 
 @login_required

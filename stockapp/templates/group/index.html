@@ -37,6 +37,9 @@
 							for (let j = 0; j < 3; j++) {
 								row.push('"' + cols[j].innerText + '"');
 							}
+							for (let j = 5; j < 8; j++) {
+								row.push('"' + cols[j].innerText + '"');
+							}
 							csv.push(row.join(','));
 						}
 						let csv_string = csv.join('\n');
