@@ -53,7 +53,7 @@ def continuous(stock_data):
     negativeING = -1
     negativeDealer = -1
 
-    for i in range(10):
+    for i in range(1, len(stock_data)):
         sumForeign = int(stock_data[i][1])
         sumING = int(stock_data[i][2])
         sumDealer = int(stock_data[i][3])
