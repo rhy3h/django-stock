@@ -3,7 +3,8 @@ from django.contrib import auth
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
+from django.contrib.auth.decorators import login_required
+from .models import *
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(
@@ -65,3 +66,11 @@ def sign_in(request):
 def logout(request):
     auth.logout(request)
     return redirect('/accounts/sign-in')
+
+@login_required
+def profile(request):
+    title = '個人檔案'
+    User = request.user
+    profile = Profile.objects.get_or_create(User = User)[0]
+    print(profile.Firstname)
+    return render(request, 'accounts/profile.html', locals())

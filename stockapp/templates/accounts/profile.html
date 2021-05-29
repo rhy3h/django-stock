@@ -14,6 +14,12 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 
 	<link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+	
+	<style>
+		.card-header {
+			color: #0061f2;
+		}
+	</style>
 	{% block mystyle %}
 	{% endblock mystyle %}
 </head>
@@ -61,52 +67,71 @@
 		</div>
 	</header>
 	
-	<div class="container-fluid">
+	<div class="container px-4 mt-4">
+		<h1 class="h2">個人檔案</h1>
+		<nav class="nav nav-borders">
+			<a class="nav-link active" href="account-profile.html">Profile</a>
+			<a class="nav-link" href="account-billing.html">Billing</a>
+			<a class="nav-link" href="account-security.html">Security</a>
+			<a class="nav-link" href="account-notifications.html">Notifications</a>
+		</nav>
+		<hr class="mt-0 mb-4" />
 		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky">
-					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-1 mb-1 text-muted">
-						<span class="fs-5">群組</span>
-						<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#new_group">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-folder-plus" viewBox="0 0 16 16">
-								<path d="m.5 3 .04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8h1.005l.256-2.819A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2zm5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19c-.24 0-.47.042-.683.12L1.5 2.98a1 1 0 0 1 1-.98h3.672z"/>
-								<path d="M13.5 10a.5.5 0 0 1 .5.5V12h1.5a.5.5 0 1 1 0 1H14v1.5a.5.5 0 1 1-1 0V13h-1.5a.5.5 0 0 1 0-1H13v-1.5a.5.5 0 0 1 .5-.5z"/>
-							</svg>
-						</button>
-					</h6>
-					<ul class="nav flex-column">
-						{% for group in group_list %}
-						<li class="nav-item">
-							{% if group.id == group_id %}
-							<a class="nav-link active" aria-current="page" href="/group/{{ group.id }}">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
-									<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
-								</svg> {{ group.Name }}
-							</a>
-							<nav class="nav nav-pills flex-column">
-								<a class="nav-link ms-3 my-1" href="#positive">
-									<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
-										<path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
-									</svg>買入
-								</a>
-								<a class="nav-link ms-3 my-1" href="#negative">
-									<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
-										<path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
-									</svg>賣出
-								</a>
-							</nav>
-							{% else %}
-							<a class="nav-link" aria-current="page" href="/group/{{ group.id }}">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
-									<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
-								</svg> {{ group.Name }}
-							</a>
-							{% endif %}
-						</li>
-						{% endfor %}
-					</ul>
+			<div class="col-xl-4">
+				<!-- Profile picture card-->
+				<div class="card mb-4 mb-xl-0">
+					<div class="card-header">個人大頭貼</div>
+					<div class="card-body text-center">
+						<img class="img-account-profile rounded-circle mb-2" src="" alt="" />
+						<div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+						<button class="btn btn-primary" type="button">上傳新的大頭貼</button>
+					</div>
 				</div>
-			</nav>
+			</div>
+			<div class="col-xl-8">
+				<!-- Account details card-->
+				<div class="card mb-4">
+					<div class="card-header">個人檔案</div>
+					<div class="card-body">
+						<form>
+							<div class="mb-3">
+								<label class="small mb-1" for="inputUsername">Username (how your name will appear to other users on the site)</label>
+								<input class="form-control" id="inputUsername" type="text" placeholder="Enter your username" value="username" />
+							</div>
+							<div class="row gx-3 mb-3">
+								<div class="col-md-6">
+									<label class="small mb-1" for="inputFirstName">姓氏</label>
+									<input class="form-control" id="inputFirstName" type="text" placeholder="Enter your first name" value="Valerie" />
+								</div>
+								<div class="col-md-6">
+									<label class="small mb-1" for="inputLastName">名子</label>
+									<input class="form-control" id="inputLastName" type="text" placeholder="Enter your last name" value="Luna" />
+								</div>
+							</div>
+							<!-- Form Group (email address)-->
+							<div class="mb-3">
+								<label class="small mb-1" for="inputEmailAddress">電子信箱</label>
+								<input class="form-control" id="inputEmailAddress" type="email" placeholder="Enter your email address" value="name@example.com" />
+							</div>
+							<!-- Form Row-->
+							<div class="row gx-3 mb-3">
+								<!-- Form Group (phone number)-->
+								<div class="col-md-6">
+									<label class="small mb-1" for="inputPhone">電話</label>
+									<input class="form-control" id="inputPhone" type="tel" placeholder="Enter your phone number" value="555-123-4567" />
+								</div>
+								<!-- Form Group (birthday)-->
+								<div class="col-md-6">
+									<label class="small mb-1" for="inputBirthday">生日</label>
+									<input class="form-control" id="inputBirthday" type="text" name="birthday" placeholder="Enter your birthday" value="06/10/1988" />
+								</div>
+							</div>
+							<!-- Save changes button-->
+							<button class="btn btn-primary" type="button">處存變更</button>
+						</form>
+					</div>
+				</div>
+			</div>
 			{% block content %}
 			{% endblock content %}
 		</div>

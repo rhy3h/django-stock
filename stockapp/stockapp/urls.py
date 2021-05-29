@@ -53,4 +53,5 @@ urlpatterns = [
     path('accounts/sign-up/', accounts.sign_up, name='sign_up'),
     path('accounts/sign-in/', accounts.sign_in, name='sign_in'),
     url('^accounts/logout', accounts.logout),
+    path('accounts/profile/', accounts.profile),
 ]
