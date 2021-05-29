@@ -1,4 +1,5 @@
 {% extends 'base/dashboard.html' %}
+{% load humanize %}
 
 {% block mystyle %}
 <style>
@@ -145,7 +146,7 @@
 							<tr>
 								<th><a href="javascript:SearchWantGoo({{ stock.id }})">{{ stock.id }}</a></th>
 								<th>{{ stock.name }}</th>
-								<th>{{ stock.diff }}</th>
+								<th>{{ stock.diff|intcomma }}</th>
 								<th>
 								{% for buy in stock.buy_in %}
 								{{ buy }}<br>
@@ -191,7 +192,7 @@
 							<tr>
 								<th><a href="javascript:SearchWantGoo({{ stock.id }})">{{ stock.id }}</a></th>
 								<th>{{ stock.name }}</th>
-								<th>{{ stock.diff }}</th>
+								<th>{{ stock.diff|intcomma }}</th>
 								<th>
 								{% for buy in stock.buy_in %}
 								{{ buy }}<br>
@@ -424,85 +425,47 @@
 			return false;
 		}
 	});
+	$("#positive_table th").each(function () 
+	{
+		if( Number($(this).text()) > 0){
+			$(this).css("color", "red");
+		}
+		else if(Number($(this).text()) < 0){
+			$(this).css("color", "green");
+		}
+	});
+	$("#negative_table th").each(function () 
+	{
+		if( Number($(this).text()) > 0){
+			$(this).css("color", "red");
+		}
+		else if(Number($(this).text()) < 0){
+			$(this).css("color", "green");
+		}
+	});
 	function SearchWantGoo(stock_id){
-		console.log(stock_id)
 		$.ajax({
-			url: '/apis/wantgoo/query',
+			url: '/apis/institutional_investors/query',
 			data: {
 				"stock_id": stock_id
 			},
 			dataType: 'json',
 			success: function (data) {
 				$("#GoodInfoTable tbody").empty();
-
-				let buy_Foreign = -1,
-					sell_Foreign = -1,
-					buy_ING = -1,
-					sell_ING = -1,
-					buy_Dealer = -1,
-					sell_Dealer = -1;
 				
-				for(let i = 0; i < data.length; i++){
-					if(buy_Foreign == -1 && data[i].sumForeign <= 0){
-						buy_Foreign = i;
-					}
-					if(sell_Foreign == -1 && data[i].sumForeign >= 0){
-						sell_Foreign = i;
-					}
-					if(buy_ING == -1 && data[i].sumING <= 0){
-						buy_ING = i;
-					}
-					if(sell_ING == -1 && data[i].sumING >= 0){
-						sell_ING = i;
-					}
-					if(buy_Dealer == -1 && data[i].sumDealer <= 0){
-						buy_Dealer = i;
-					}
-					if(sell_Dealer == -1 && data[i].sumDealer >= 0){
-						sell_Dealer = i;
-					}
-					
+				for(let i = 1; i < data.length; i++){
 					text =
 						"<tr>" + 
-						"<th>" + data[i].date + "</th>" + 
-						"<th>" + data[i].sumForeign + "</th>" + 
-						"<th>" + data[i].sumING + "</th>" + 
-						"<th>" + data[i].sumDealer + "</th>" + 
+						"<th>" + data[i][0] + "</th>" + 
+						"<th>" + data[i][1] + "</th>" + 
+						"<th>" + data[i][2] + "</th>" + 
+						"<th>" + data[i][3] + "</th>" + 
 					"</tr>";
 					
 					$("#GoodInfoTable tbody").append(
 						text
 					);
 				}
-				if(buy_Foreign > sell_Foreign)
-					Foreign = buy_Foreign;
-				else
-					Foreign = -sell_Foreign;
-				
-				if(Foreign == 0 && data[0].sumForeign != 0)
-					Foreign = 10;
-
-				if(buy_ING > sell_ING)
-					ING = buy_ING;
-				else
-					ING = -sell_ING;
-				if(ING == 0 && data[0].sumING != 0)
-					ING = 10;
-				
-				if(buy_Dealer > sell_Dealer)
-					Dealer = buy_Dealer;
-				else
-					Dealer = -sell_Dealer;
-				if(Dealer == 0 && data[0].sumDealer != 0)
-					Dealer = 10;
-				text =
-				"<tr>" + 
-					"<th>" + "天數" + "</th>" + 
-					"<th>" + Foreign + " 天" + "</th>" + 
-					"<th>" + ING + " 天"+ "</th>" + 
-					"<th>" + Dealer + " 天"+ "</th>" + 
-				"</tr>";
-				$('#GoodInfoTable tbody').prepend(text);
 				
 				$("#GoodInfoTable th").each(function () 
 				{

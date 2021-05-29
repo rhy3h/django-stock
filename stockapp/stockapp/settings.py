@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'stockapp'
+    'django.contrib.humanize',
+    'stockapp',
 ]
 
 MIDDLEWARE = [
@@ -111,11 +112,14 @@ LANGUAGE_CODE = 'zh-Hant'
 
 TIME_ZONE = 'Asia/Taipei'
 
-USE_I18N = True
+# USE_I18N = True
 
-USE_L10N = True
+# USE_L10N = True
+
+USE_THOUSAND_SEPARATOR = True
 
 USE_TZ = True
+
 
 LOGIN_URL = '/accounts/sign-in'
 

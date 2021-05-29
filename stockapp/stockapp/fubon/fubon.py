@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
 from .fubon_list import *
-from ..apis import *
 from bs4 import BeautifulSoup
 
 class Branch:

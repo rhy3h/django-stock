@@ -31,7 +31,7 @@ urlpatterns = [
     path('', cover.index),
     path('index/', cover.index),
 
-    path('apis/wantgoo/query', apis.wantgoo),
+    path('apis/institutional_investors/query', apis.institutional_investors),
 
     path('header/', views.header),
 
