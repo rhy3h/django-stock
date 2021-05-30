@@ -2,8 +2,7 @@ from django.http import JsonResponse
 
 from .wantgoo.institutional_investors import institutional_investors_data, continuous, read_csv, write_csv
 
-def institutional_investors(request):
-    stock_id = request.GET.get('stock_id')
+def institutional_investors(request, stock_id):
     data = []
     
     if len(stock_id) != 4:

@@ -445,9 +445,8 @@
 	});
 	function SearchWantGoo(stock_id){
 		$.ajax({
-			url: '/apis/institutional_investors/query',
+			url: '/apis/institutional_investors/' + stock_id,
 			data: {
-				"stock_id": stock_id
 			},
 			dataType: 'json',
 			success: function (data) {

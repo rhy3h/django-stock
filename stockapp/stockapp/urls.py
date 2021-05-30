@@ -31,7 +31,7 @@ urlpatterns = [
     path('', cover.index),
     path('index/', cover.index),
 
-    path('apis/institutional_investors/query', apis.institutional_investors),
+    path('apis/institutional_investors/<str:stock_id>/', apis.institutional_investors),
 
     path('header/', views.header),
 
@@ -47,8 +47,7 @@ urlpatterns = [
 
     path('stock/', stock.base),
     path('stock/<str:code>/', stock.index),
-    path('stock/<str:code>/financial-statements', stock.financial_statements),
-    path('stock/<str:code>/financial-statements-api', stock.financial_statements_api),
+    path('stock/<str:code>/technical-chart/', stock.technical_chart),
 
     path('accounts/sign-up/', accounts.sign_up, name='sign_up'),
     path('accounts/sign-in/', accounts.sign_in, name='sign_in'),

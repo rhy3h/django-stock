@@ -1,6 +1,7 @@
 import requests
 import csv
 import os
+from .apis import api
 
 def write_csv(file, data):
     with open(file, "a", newline = "") as file:
@@ -22,14 +23,9 @@ def institutional_investors_data(stock_id):
     
     url = "https://www.wantgoo.com/stock/" + stock_id + "/institutional-investors/trend-data?topdays=10"
 
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    }
-
-    resource_page = requests.get(url,headers = headers)
-    resource_page.encoding = 'utf-8'
+    resource_page = api(url)
     
-    for item in resource_page.json():
+    for item in resource_page:
         temp = {}
         sumForeign = item['sumForeignWithDealer'] + item['sumForeignNoDealer']
         sumING = item['sumING']
