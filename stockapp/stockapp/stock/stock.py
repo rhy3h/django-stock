@@ -59,6 +59,8 @@ def technical_chart(request, code):
     for item in data:
         item['time'] = datetime.datetime.fromtimestamp((item['time'] / 1000)).strftime("%Y-%m-%d")
     
+    data = list(reversed(data))
+
     stocks = load_stock_list()
     for item in stocks:
         if item[0] == code:
