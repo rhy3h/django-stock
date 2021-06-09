@@ -26,9 +26,10 @@ def base(request):
     return render(request, 'group/index.html', locals())
 
 def progress_bar(count, length):
-    sys.stdout.write('\r')
-    sys.stdout.write("[%-25s] %d/%d (%d%%)" % ('='*(int)(count / length * 25), count, length, (count / length * 100)))
-    sys.stdout.flush()
+    # sys.stdout.write('\r')
+    # sys.stdout.write("[%-25s] %d/%d (%d%%)" % ('='*(int)(count / length * 25), count, length, (count / length * 100)))
+    # sys.stdout.flush()
+    print("[%-25s] %d/%d (%d%%)" % ('='*(int)(count / length * 25), count, length, (count / length * 100)), end='\r')
 
 @login_required
 def index(request, group_id):
