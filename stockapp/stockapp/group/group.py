@@ -26,9 +26,6 @@ def base(request):
     return render(request, 'group/index.html', locals())
 
 def progress_bar(count, length):
-    # sys.stdout.write('\r')
-    # sys.stdout.write("[%-25s] %d/%d (%d%%)" % ('='*(int)(count / length * 25), count, length, (count / length * 100)))
-    # sys.stdout.flush()
     print("[%-25s] %d/%d (%d%%)" % ('='*(int)(count / length * 25), count, length, (count / length * 100)), end='\r')
 
 @login_required
@@ -36,14 +33,13 @@ def index(request, group_id):
     User = request.user
     group_list = Group.objects.filter(Owner=User)
     group = group_list.get(id = group_id)
-    
     title = '群組 ' + group.Name
     broker_list = Broker.objects.filter(Group = group)
     today = date.today().strftime("%Y-%m-%d")
     begin_date = today
     end_date = today
 
-    if request.method == 'POST':
+    if request.POST.get('search'):
         if request.POST.get('end_date') != '':
             begin_date = request.POST.get('begin_date')
             end_date = request.POST.get('end_date')
@@ -94,6 +90,17 @@ def edit(request, group_id):
         group.Name = new_group_name
         group.save()
     
+    return redirect('/group/' + str(group_id))
+
+@login_required
+def clear(request, group_id):
+    User = request.user
+    group_list = Group.objects.filter(Owner=User)
+    group = group_list.get(id = group_id)
+    broker_list = Broker.objects.filter(Group = group)
+    for broker in broker_list:
+        broker.delete()
+
     return redirect('/group/' + str(group_id))
 
 @login_required

@@ -20,16 +20,14 @@
 		{% csrf_token %}
 		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h1 class="h2">{{ group.Name }}
-				<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#edit_group">
-					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-						<path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-					</svg>
+				<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit_group">
+					編輯
 				</button>
-				<a class="btn btn-link" onclick="download_all_table();">
-					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
-						<path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
-						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-					</svg>
+				<a href="delete" class="btn btn-outline-danger">
+					刪除
+				</a>
+				<a class="btn btn-outline-info" onclick="download_all_table();">
+					下載
 				</a>
 				
 				<script>
@@ -82,31 +80,23 @@
 				</div>
 				<div class="col-sm-2 col-12 mr-2">
 					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
-					<button class="btn btn-primary" type="submit">
-						<i class="bi bi-search"></i>
-					</button>
+					<input class="btn btn-outline-primary" type="submit" value="搜尋" name="search">
 				</div>
 			</div>
 		</div>
 	</form>
 	<h3 class="h3">券商清單
-		<button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#add_broker">
-			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-				<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-				<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-			</svg>
+		<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add_broker">
+			新增
 		</button>
-		<a class="btn btn-link" target="_blank" href="download">
-			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
-				<path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
-				<path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
-			</svg>
+		<a class="btn btn-outline-danger" href="clear">
+			清除
 		</a>
-		<a class="btn btn-link"data-bs-toggle="modal" data-bs-target="#upload">
-			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cloud-upload" viewBox="0 0 16 16">
-				<path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
-				<path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>
-			</svg>
+		<a class="btn btn-outline-primary" target="_blank" href="download">
+			下載
+		</a>
+		<a class="btn btn-outline-primary"data-bs-toggle="modal" data-bs-target="#upload">
+			上傳
 		</a>
 	</h3>
 	<div id="broker_list" class="row">
@@ -238,8 +228,7 @@
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-				<button type="button" class="btn btn-primary" onclick="document.getElementById('add_group_submit').click()">新增</button>
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add_group_submit').click()">新增</button>
 			</div>
 		</div>
 	</div>
@@ -255,24 +244,15 @@
 				<form class="needs-validation" method="POST" action="edit" novalidate>
 				{% csrf_token %}
 					<div class="form-floating mb-3">
-						<input type="text" class="form-control" id="new_group_name" name="new_group_name" placeholder="新名稱" required>
+						<input type="text" class="form-control" id="new_group_name" name="new_group_name" value="{{ group.Name }}" placeholder="新名稱" required>
 						<label for="new_group_name">新名稱</label>
 					</div>
 					<button class="" type="submit" id="edit_group_submit" hidden>Continue to checkout</button>
 				</form>
 			</div>
-			<div class="modal-footer justify-content-between">
-				<a href="delete" class="btn btn-outline-danger">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-						<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-						<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-					</svg>
-				</a>
+			<div class="modal-footer">
 				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('edit_group_submit').click()">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-						<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-						<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-					</svg>
+					確認
 				</button>
 			</div>
 		</div>
@@ -351,10 +331,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add_broker_submit').click()">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
-						<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-						<path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-					</svg>
+					確認
 				</button>
 			</div>
 		</div>

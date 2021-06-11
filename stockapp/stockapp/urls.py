@@ -40,8 +40,9 @@ urlpatterns = [
     path('group/<int:group_id>/', group.index),
     path('group/<int:group_id>/edit', group.edit),
     path('group/<int:group_id>/delete', group.delete),
-    path('group/<int:group_id>/download', group.download),
+    path('group/<int:group_id>/clear', group.clear),
     path('group/<int:group_id>/upload', group.upload),
+    path('group/<int:group_id>/download', group.download),
     path('group/<int:group_id>/add-broker/', group.add_broker),
     path('group/<int:group_id>/del-broker/<int:broker_id>', group.del_broker),
 
