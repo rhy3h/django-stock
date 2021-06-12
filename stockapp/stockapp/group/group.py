@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -10,9 +10,7 @@ from ..models import Group, Broker
 from ..fubon.fubon import fubon_get_list, get_id_name, get_branch
 from ..wantgoo.institutional_investors import institutional_investors_data, stock_append_data
 
-import os
-import sys
-import csv, codecs
+import os, csv, codecs
 
 def progress_bar(count, length):
     print("[%-25s] %d/%d (%d%%)" % ('='*(int)(count / length * 25), count, length, (count / length * 100)), end='\r')
@@ -74,7 +72,7 @@ def sync(request, group_id):
     
     print("爬蟲時間", end_time - begin_time)
 
-    return redirect('/group/' + str(group_id))
+    return JsonResponse([], safe=False)
 
 @login_required
 def index(request, group_id):
@@ -109,9 +107,9 @@ def index(request, group_id):
             broker_branch.append([broker.Broker, broker.Branch])
         stock_list = fubon_get_list(broker_branch, begin_date, end_date)
         for item in stock_list['positive']:
-            item = stock_append_data(item)
+            item = stock_append_data(item, end_date)
         for item in stock_list['negative']:
-            item = stock_append_data(item)
+            item = stock_append_data(item, end_date)
     with open('stockapp/static/js/stock.csv', newline='', encoding='utf-8-sig') as f:
         reader = csv.reader(f)
         stocks = list(reader)

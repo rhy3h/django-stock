@@ -72,5 +72,4 @@ def profile(request):
     title = '個人檔案'
     User = request.user
     profile = Profile.objects.get_or_create(User = User)[0]
-    print(profile.Firstname)
     return render(request, 'accounts/profile.html', locals())

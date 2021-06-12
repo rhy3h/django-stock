@@ -3,12 +3,17 @@ import csv
 import os
 from .apis import api
 
-def read_csv(file):
-    data = []
+def read_csv(file, end_date):
+    data = [['date', 'sumForeign', 'sumING', 'sumDealer']]
+    count = 0
     with open(file, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            data.append(row)
+            if count > 20:
+                break
+            if end_date[5:] >= row[0]:
+                data.append(row)
+                count += 1
     return data
 
 def institutional_investors_data(stock_id):
@@ -94,12 +99,12 @@ def continuous(stock_data):
     
     return data
 
-def stock_append_data(item):
+def stock_append_data(item, end_date):
     stock_id = item['id']
     if len(stock_id) == 5:
         return item
     try:
-        stock_data = read_csv('stockapp/csv/' + stock_id + '.csv')
+        stock_data = read_csv('stockapp/csv/' + stock_id + '.csv', end_date)
         count = continuous(stock_data[1:])
         item['sumForeign'] = count['sumForeign']
         item['sumING'] = count['sumING']

@@ -68,9 +68,11 @@
 					}
 				</script>
 			</h1>
-			<a href="sync" class="btn btn-outline-dark">
+
+			<a href="javascript:Crawler_GoodInfo()" class="btn btn-outline-dark">
 				同步
 			</a>
+
 			<div class="row no-gutters align-items-center">
 				<div class="col-sm-5 col-12 mr-2">
 					<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
@@ -365,6 +367,20 @@
 	</div>
 </div>
 
+<div class="modal fade" id="Crawler_Modal" tabindex="-1" aria-labelledby="Crawler_Modal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header h1 d-flex justify-content-center">
+				爬蟲進行中
+			</div>
+			<div class="modal-body h5 d-flex justify-content-center">
+				<div class="spinner-border" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock modal %}
 
 {% block script %}
@@ -423,8 +439,9 @@
 		}
 	});
 	function SearchWantGoo(stock_id){
+		let end_date = $("#end_date").val();
 		$.ajax({
-			url: '/apis/institutional_investors/' + stock_id,
+			url: '/apis/institutional_investors/' + stock_id + '/' + end_date,
 			data: {
 			},
 			dataType: 'json',
@@ -456,6 +473,22 @@
 				});
 				$("#GoodInfoText").text(stock_id)
 				$('#SearchWantGoo').modal('show')
+			}
+		});
+	}
+	function Crawler_GoodInfo(){
+		$("#Crawler_Modal").modal('show');
+
+		$.ajax({
+			url: 'sync/',
+			data: {
+			},
+			dataType: 'json',
+			success: function (data) {
+				$("#Crawler_Modal .modal-header").text("爬蟲完畢");
+				$("#Crawler_Modal .modal-body").empty();
+				$("#Crawler_Modal .modal-body").text("三秒後重整");
+				setTimeout(function(){ location.reload() }, 3000);
 			}
 		});
 	}
