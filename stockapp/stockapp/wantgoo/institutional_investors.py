@@ -3,13 +3,6 @@ import csv
 import os
 from .apis import api
 
-def write_csv(file, data):
-    with open(file, "a", newline = "") as file:
-        writer = csv.writer(file)
-        for row in data:
-            writer.writerow(row)
-    return data
-
 def read_csv(file):
     data = []
     with open(file, 'r') as file:
@@ -21,7 +14,7 @@ def read_csv(file):
 def institutional_investors_data(stock_id):
     data = []
     
-    url = "https://www.wantgoo.com/stock/" + stock_id + "/institutional-investors/trend-data?topdays=10"
+    url = "https://www.wantgoo.com/stock/" + stock_id + "/institutional-investors/trend-data?topdays=90"
 
     resource_page = api(url)
     
@@ -101,32 +94,17 @@ def continuous(stock_data):
     
     return data
 
-def stock_append_data(item, date):
+def stock_append_data(item):
     stock_id = item['id']
     if len(stock_id) == 5:
         return item
     try:
         stock_data = read_csv('stockapp/csv/' + stock_id + '.csv')
-        if date == stock_data[1][0]:
-            count = continuous(stock_data[1:])
-            item['sumForeign'] = count['sumForeign']
-            item['sumING'] = count['sumING']
-            item['sumDealer'] = count['sumDealer']
-        else:
-            os.remove('stockapp/csv/' + stock_id + '.csv')
-            data = [['date', 'sumForeign', 'sumING', 'sumDealer']]
-            for item in institutional_investors_data(stock_id):
-                data.append([item['date'], item['sumForeign'], item['sumING'], item['sumDealer']])
-            write_csv('stockapp/csv/' + stock_id + '.csv', data)
-    except:
-        data = [['date', 'sumForeign', 'sumING', 'sumDealer']]
-        for item in institutional_investors_data(stock_id):
-            data.append([item['date'], item['sumForeign'], item['sumING'], item['sumDealer']])
-        write_csv('stockapp/csv/' + stock_id + '.csv', data)
-        stock_data = read_csv('stockapp/csv/' + stock_id + '.csv')
         count = continuous(stock_data[1:])
         item['sumForeign'] = count['sumForeign']
         item['sumING'] = count['sumING']
         item['sumDealer'] = count['sumDealer']
+    except:
+        pass
     
     return item
