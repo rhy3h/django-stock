@@ -17,12 +17,13 @@ def index(request):
 
     for file in request.FILES.getlist('uploadfiles'):
         for line in file:
-            string = line.decode("utf-8-sig").replace('\"', '').replace('\n', '').split(',')
+            string = line.decode("utf-8-sig").replace('\"', '').replace('\t', '').replace('\r\n', '').split(',')
             if string[0] != '股票代碼':
+                print(string)
                 code = string[0]
                 name = string[1]
                 diff = ""
-                for item in string[2:-3]:
+                for item in string[2:-5]:
                     diff += item.replace(' ', '')
                 stock = Stock(code, name, int(diff))
 
