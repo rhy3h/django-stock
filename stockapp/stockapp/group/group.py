@@ -87,9 +87,9 @@ def index(request, group_id):
 
     if request.POST.get('search'):
         if request.POST.get('end_date') != '':
-            begin_date = request.POST.get('begin_date')
+            begin_date = request.POST.get('begin-date')
             begin_datatime = datetime.strptime(begin_date, "%Y-%m-%d")
-            end_date = request.POST.get('end_date')
+            end_date = request.POST.get('end-date')
             end_datatime = datetime.strptime(end_date, "%Y-%m-%d")
 
             if end_datatime.isoweekday() > 5:
@@ -119,7 +119,7 @@ def index(request, group_id):
 @login_required
 def create(request):
     if request.method == "POST":
-        group_name = request.POST['group_name']
+        group_name = request.POST['group-name']
         User = request.user
         Group.objects.get_or_create(Owner = User,
                                 Name = group_name)
@@ -130,7 +130,7 @@ def create(request):
 @login_required
 def edit(request, group_id):
     if request.method == "POST":
-        new_group_name = request.POST['new_group_name']
+        new_group_name = request.POST['new-group-name']
         User = request.user
         group = Group.objects.get(Owner = User,
                             id = group_id)
@@ -164,8 +164,8 @@ def add_broker(request, group_id):
     if request.method == "POST":
         User = request.user
         group = Group.objects.filter(Owner=User).get(id = group_id)
-        broker = str(request.POST['select_broker'])
-        branch = str(request.POST['select_branch'])
+        broker = str(request.POST['select-broker'])
+        branch = str(request.POST['select-branch'])
         
         Broker.objects.get_or_create(Group = group,
                                 Name = get_id_name(branch).name,

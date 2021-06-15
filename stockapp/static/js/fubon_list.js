@@ -17,13 +17,13 @@ function generate_broker_list(){
 }
 
 function generate_branch_list(){
-	select_broker_index = $("#select_broker option:selected").index() - 1
-	$("#select_branch").empty();
+	select_broker_index = $("#select-broker option:selected").index() - 1
+	$("#select-branch").empty();
 	
 	BrokerTmpAry4 = BrokerTmpAry1[select_broker_index].split('!');
 	
 	for (i = 1; i < BrokerTmpAry4.length; i++) {
 		BrokerTmpAry5 = BrokerTmpAry4[i].split(',');
-		$("#select_branch").append(new Option(BrokerTmpAry5[1], BrokerTmpAry5[0]));
+		$("#select-branch").append(new Option(BrokerTmpAry5[1], BrokerTmpAry5[0]));
 	}
 }

@@ -37,13 +37,36 @@ def index(request, group_id):
 @login_required
 def create(request):
     if request.method == "POST":
-        stock_group_name = request.POST['stock_group_name']
+        stock_group_name = request.POST['stock-group-name']
         User = request.user
         StockGroup.objects.get_or_create(Owner = User,
                                 Name = stock_group_name)
         stock_group = StockGroup.objects.filter(Owner=User).last()
 
         return redirect('/stock/' + str(stock_group.id))
+
+@login_required
+def edit(request, group_id):
+    if request.method == "POST":
+        new_group_name = request.POST['new-group-name']
+        User = request.user
+        stock_group = StockGroup.objects.get(
+            Owner = User,
+            id = group_id
+        )
+        stock_group.Name = new_group_name
+        stock_group.save()
+    
+    return redirect('/stock/' + str(stock_group.id))
+
+@login_required
+def delete(request, group_id):
+    User = request.user
+    stock_group = StockGroup.objects.get(Owner = User,
+                        id = group_id)
+    stock_group.delete()
+
+    return redirect('/stock/')
 
 import datetime
 

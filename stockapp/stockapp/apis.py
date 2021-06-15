@@ -13,5 +13,5 @@ def institutional_investors(request, stock_id, end_date):
         data.insert(1, ['天數', count['sumForeign'], count['sumING'], count['sumDealer']])
     except:
         pass
-        
+    
     return JsonResponse(data, safe=False)

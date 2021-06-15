@@ -51,6 +51,8 @@ urlpatterns = [
     path('stock/', stock.base),
     path('stock/create/', stock.create),
     path('stock/<int:group_id>/', stock.index),
+    path('stock/<int:group_id>/edit', stock.edit),
+    path('stock/<int:group_id>/delete', stock.delete),
     path('stock/<int:group_id>/technical-chart/', stock.technical_chart),
 
     path('leaderboard/', leaderboard.index),
