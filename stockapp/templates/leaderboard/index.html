@@ -6,28 +6,31 @@
 
 {% block sidebar %}
 <div class="sidebar">
+	<!-- Sidebar user (optional) -->
+	<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+		<div class="image">
+			
+		</div>
+		<div class="info">
+			<a class="d-block">{{ User }}</a>
+		</div>
+	</div>
+
 	<!-- Sidebar Menu -->
 	<nav class="mt-2">
-		<ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-			<!-- <li class="nav-item">
-				<a href="#new-group" class="nav-link" data-toggle="modal" data-target="#new-group">
-					<i class="far fa-circle nav-icon"></i>
-					<p>新增</p>
-				</a>
-			</li>
-			{% for group in group_list %}
-			<li class="nav-item">
-				<a href="/group/{{ group.id }}" class="nav-link">
-				<i class="far fa-circle nav-icon"></i>
-				<p>{{ group.Name }}</p>
-				</a>
-			</li>
-			{% endfor %} -->
+		<ul id="sidebar"  class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+			
 		</ul>
 	</nav>
 	<!-- /.sidebar-menu -->
 </div>
 <!-- /.sidebar -->
+
+<div class="sidebar-custom">
+	<a href="#positive"class="btn btn-secondary hide-on-collapse">買入</a>
+	<a href="#negative" class="btn btn-secondary hide-on-collapse pos-right">賣出</a>
+</div>
+<!-- /.sidebar-custom -->
 {% endblock sidebar %}
 
 {% block content %}
@@ -53,7 +56,7 @@
 	<div class="content">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-12">
+				<div class="col-lg-12" id="positive">
 					<div class="card">
 						<div class="card-header text-primary">
 							買入排行榜
@@ -92,7 +95,7 @@
 					<!-- /.card -->
 				</div>
 				<!-- /.col-md-6 -->
-				<div class="col-lg-12">
+				<div class="col-lg-12"  id="negative">
 					<div class="card">
 						<div class="card-header text-primary">
 							賣出排行榜

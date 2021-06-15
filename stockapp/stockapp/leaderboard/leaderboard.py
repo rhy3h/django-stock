@@ -11,6 +11,7 @@ class Stock:
 
 @login_required
 def index(request):
+    User = request.user
     title = "排行榜"
     leader_buyin_list = []
     leader_sellout_list = []
@@ -19,7 +20,6 @@ def index(request):
         for line in file:
             string = line.decode("utf-8-sig").replace('\"', '').replace('\t', '').replace('\r\n', '').split(',')
             if string[0] != '股票代碼':
-                print(string)
                 code = string[0]
                 name = string[1]
                 diff = ""
@@ -28,23 +28,24 @@ def index(request):
                 stock = Stock(code, name, int(diff))
 
                 if stock.diff > 0:
-                    flag_index = False
+                    flag_index = -1
                     for item in leader_buyin_list:
                         if item.code == stock.code:
-                            flag_index = leader_buyin_list.index(item)
-                    
-                    if flag_index:
+                            flag_index = int(leader_buyin_list.index(item))
+                            break
+
+                    if flag_index > -1:
                         leader_buyin_list[flag_index].diff += stock.diff
                         leader_buyin_list[flag_index].days += 1
                     else:
                         leader_buyin_list.append(stock)
                 else:
-                    flag_index = False
+                    flag_index = -1
                     for item in leader_sellout_list:
                         if item.code == stock.code:
-                            flag_index = leader_sellout_list.index(item)
+                            flag_index = int(leader_sellout_list.index(item))
                     
-                    if flag_index:
+                    if flag_index > -1:
                         leader_sellout_list[flag_index].diff += stock.diff
                         leader_sellout_list[flag_index].days += 1
                     else:
