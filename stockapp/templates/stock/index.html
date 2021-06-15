@@ -1,25 +1,77 @@
 {% extends 'base/dashboard.html' %}
-{% load static %}
-	
+{% load humanize %}
+
 {% block mystyle %}
+<style>
+	th {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>
 {% endblock mystyle %}
 
-{% block content %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h1 class="h2">{{ code }} {{ code_name }}</h1>
-	</div>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<div class="container-fluid">
-			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-				<li class="nav-item">
-					<a class="nav-link" href="technical-chart">技術分析</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link active" href="">不要案</a>
-				</li>
-			</ul>
-		</div>
+{% block sidebar %}
+<div class="sidebar">
+	<!-- Sidebar Menu -->
+	<nav class="mt-2">
+		<ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+			<!-- <li class="nav-item">
+				<a href="#new-group" class="nav-link" data-bs-toggle="modal" data-bs-target="#new-group">
+					<i class="far fa-circle nav-icon"></i>
+					<p>新增</p>
+				</a>
+			</li>
+			{% for group in group_list %}
+			<li class="nav-item">
+				<a href="/group/{{ group.id }}" class="nav-link">
+				<i class="far fa-circle nav-icon"></i>
+				<p>{{ group.Name }}</p>
+				</a>
+			</li>
+			{% endfor %} -->
+		</ul>
 	</nav>
-</main>
+	<!-- /.sidebar-menu -->
+</div>
+{% endblock sidebar %}
+
+<!-- /.sidebar -->
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Content Header (Page header) -->
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="row">
+				<!-- <div class="col-sm-4 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+					<h1 class="m-0">{{ group.Name }}
+						<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit-group">
+							編輯
+						</a>
+						
+					</h1>
+				</div> -->
+				<!-- /.col -->
+			</div><!-- /.row -->
+
+		</div><!-- /.container-fluid -->
+	</div>
+	<!-- /.content-header -->
+
+	<div class="content">
+		<div class="container-fluid">
+			<div class="row">
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+</div>
+<!-- /.content-wrapper -->
 {% endblock content %}
+
+{% block modal %}
+{% endblock modal %}
+
+{% block script %}
+{% endblock script %}

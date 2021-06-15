@@ -21,6 +21,7 @@ from . import views, apis, accounts
 from .cover import cover
 from .group import group
 from .stock import stock
+from .leaderboard import leaderboard
 
 handler404 = views.page_not_found
 handler500 = views.internal_server_error
@@ -48,8 +49,11 @@ urlpatterns = [
     path('group/<int:group_id>/del-broker/<int:broker_id>', group.del_broker),
 
     path('stock/', stock.base),
-    path('stock/<str:code>/', stock.index),
-    path('stock/<str:code>/technical-chart/', stock.technical_chart),
+    path('stock/create/', stock.create),
+    path('stock/<int:group_id>/', stock.index),
+    path('stock/<int:group_id>/technical-chart/', stock.technical_chart),
+
+    path('leaderboard/', leaderboard.index),
 
     path('accounts/sign-up/', accounts.sign_up, name='sign_up'),
     path('accounts/sign-in/', accounts.sign_in, name='sign_in'),

@@ -1,0 +1,104 @@
+{% extends 'base/dashboard.html' %}
+
+{% block mystyle %}
+{% endblock mystyle %}
+
+{% block sidebar %}
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+	<div class="position-sticky">
+		<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-1 mb-1 text-muted">
+			<span class="fs-5">股票群組</span>
+			<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#new_stock_group">
+				新增
+			</button>
+		</h6>
+		<ul class="nav flex-column">
+			{% for group in stock_group %}
+			<li class="nav-item">
+				{% if group.id == group_id %}
+				<a class="nav-link active" aria-current="page" href="/stock/{{ group.id }}">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
+						<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+					</svg> {{ group.Name }}
+				</a>
+				{% else %}
+				<a class="nav-link" aria-current="page" href="/stock/{{ group.id }}">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
+						<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+					</svg> {{ group.Name }}
+				</a>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</nav>
+{% endblock sidebar %}
+
+{% block content %}
+{% if group_id %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<h1 class="h2">{{ group.Name }}
+			<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit_group">
+				編輯
+			</button>
+			<a href="delete" class="btn btn-outline-danger">
+				刪除
+			</a>
+		</h1>
+	</div>
+</main>
+{% endif %}
+{% endblock content %}
+
+{% block modal %}
+<div class="modal fade" id="new_stock_group" tabindex="-1" aria-labelledby="new_group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增股票群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="/stock/create/" novalidate>
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="stock_group_name" name="stock_group_name" placeholder="群組名稱" required>
+						<label for="stock_group_name">股票群組名稱</label>
+					</div>
+					<button class="" type="submit" id="add_group_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add_group_submit').click()">新增</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit_group" tabindex="-1" aria-labelledby="edit_group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">編輯群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="edit" novalidate>
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="new_group_name" name="new_group_name" value="{{ group.Name }}" placeholder="新名稱" required>
+						<label for="new_group_name">新名稱</label>
+					</div>
+					<button class="" type="submit" id="edit_group_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('edit_group_submit').click()">
+					確認
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock modal %}

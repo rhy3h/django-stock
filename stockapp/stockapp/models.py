@@ -5,6 +5,10 @@ class Group(models.Model):
     Owner = models.ForeignKey(User, on_delete=models.CASCADE)
     Name = models.TextField(blank=False)
 
+class StockGroup(models.Model):
+    Owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    Name = models.TextField(blank=False)
+
 class Broker(models.Model):
     Group = models.ForeignKey(Group, on_delete=models.CASCADE)
     Name = models.TextField(blank=False)

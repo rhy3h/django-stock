@@ -1,283 +1,133 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-	<meta name="generator" content="Hugo 0.82.0">
 	<title>{{ title }}</title>
-	<link rel="icon" href="{% static 'img/dollar.svg'%}">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 
-	<link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
-	{% block mystyle %}
-	{% endblock mystyle %}
-	<style>
-		/*the container must be positioned relative:*/
-		.autocomplete {
-			position: relative;
-			display: inline-block;
-		}
-
-		.autocomplete-items {
-			position: absolute;
-			border: 1px solid #d4d4d4;
-			border-bottom: none;
-			border-top: none;
-			z-index: 99;
-			/*position the autocomplete items to be the same width as the container:*/
-			top: 100%;
-			left: 50%;
-			right: 0;
-			width: 300px;
-			margin: 0 0 0 -150px;
-		}
-
-		.autocomplete-items div {
-			padding: 10px;
-			cursor: pointer;
-			background-color: #fff; 
-			border-bottom: 1px solid #d4d4d4; 
-		}
-
-		/*when hovering an item:*/
-		.autocomplete-items div:hover {
-			background-color: #e9e9e9; 
-		}
-
-		/*when navigating through the items using the arrow keys:*/
-		.autocomplete-active {
-			background-color: DodgerBlue !important; 
-			color: #ffffff; 
-		}
-		th {
-			text-align: center;
-			vertical-align: middle;
-		}
-		a {
-			text-decoration:none;
-		}
-	</style>
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<!-- DataTables -->
+	<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+	<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+	<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
 </head>
+<!--
+`body` tag options:
 
-<body>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.3.1/dist/chart.min.js" integrity="sha256-BSa1suEDn1YuT46b7ZQLKfmV3Bk3CViZ4dyj5FMoZHA=" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-	<script src="{% static 'js/fubon_list.js' %}"></script>
-	
-	<header class="sticky-top bg-light d-flex flex-wrap align-items-center justify-content-evenly py-3  border-bottom">
-		<a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="me-2" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
-				<path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5z"/>
-			</svg>
-			<span class="fs-4">股票</span>
+  Apply one or more of the following classes to to the body tag
+  to get the desired effect
+
+  * sidebar-collapse
+  * sidebar-mini
+-->
+<body class="hold-transition sidebar-mini">
+
+	<!-- jQuery -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'js/fubon_list.js' %}"></script>
+
+<div class="wrapper">
+  	<!-- Navbar -->
+	<nav id="navbar-nav" class="main-header navbar navbar-expand navbar-white navbar-light">
+		<!-- Left navbar links -->
+		<ul class="navbar-nav">
+		<li class="nav-item">
+			<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+		</li>
+		<li class="nav-item d-none d-sm-inline-block">
+			<a href="/group" class="nav-link">券商群組</a>
+		</li>
+		<li class="nav-item d-none d-sm-inline-block">
+			<a href="/stock" class="nav-link">股票群組</a>
+		</li>
+		<li class="nav-item d-none d-sm-inline-block">
+			<a href="/leaderboard" class="nav-link">排行榜</a>
+		</li>
+		</ul>
+
+		<!-- Right navbar links -->
+		<ul class="navbar-nav ml-auto">
+		<li class="nav-item">
+			<a class="nav-link" data-widget="fullscreen" href="#" role="button">
+			<i class="fas fa-expand-arrows-alt"></i>
+			</a>
+		</li>
+		</ul>
+	</nav>
+ 	 <!-- /.navbar -->
+
+	<!-- Main Sidebar Container -->
+	<aside class="main-sidebar sidebar-dark-primary elevation-4">
+		<!-- Brand Logo -->
+		<a href="/" class="brand-link">
+		<span class="brand-text font-weight-light">股票</span>
 		</a>
-		
-		<form class="mb-2 d-none d-sm-block">
-			<input type="search" id="stock_search" class="form-control form-control-dark" placeholder="搜尋" aria-label="Search" autocomplete="off">
-		</form>
+		{% block sidebar %}
+		{% endblock sidebar %}
+		<!-- Sidebar -->
+	</aside>
 
-		<div class="text-end">
-			<div class="row">
-				<div class="col-6">
-					<button class="navbar-toggler" type="button" data-bs-toggle="dropdown" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-						<img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-					</button>
-					<ul class="dropdown-menu dropdown-menu-lg-end">
-						<li><a class="dropdown-item">您好，{{ User }}</a></li>
-						<li><hr class="dropdown-divider"></li>
-						<li><a class="dropdown-item" href="#">設定</a></li>
-						<li><a class="dropdown-item" href="/accounts/profile">個人檔案</a></li>
-						<li><hr class="dropdown-divider"></li>
-						<li><a class="dropdown-item" href="/accounts/logout">登出</a></li>
-					</ul>
-				</div>
-				<div class="col-6">
-					<button class="navbar-toggler d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-							<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-						</svg>
-					</button>
-				</div>
-			</div>
-		</div>
-	</header>
-	
-	<div class="container-fluid">
-		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky">
-					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-1 mb-1 text-muted">
-						<span class="fs-5">群組</span>
-						<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#new_group">
-							新增
-						</button>
-					</h6>
-					<ul class="nav flex-column">
-						{% for group in group_list %}
-						<li class="nav-item">
-							{% if group.id == group_id %}
-							<a class="nav-link active" aria-current="page" href="/group/{{ group.id }}">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
-									<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
-								</svg> {{ group.Name }}
-							</a>
-							<nav class="nav nav-pills flex-column">
-								<a class="nav-link ms-3 my-1" href="#positive">
-									<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
-										<path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
-									</svg>買入
-								</a>
-								<a class="nav-link ms-3 my-1" href="#negative">
-									<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
-										<path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
-									</svg>賣出
-								</a>
-							</nav>
-							{% else %}
-							<a class="nav-link" aria-current="page" href="/group/{{ group.id }}">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
-									<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
-								</svg> {{ group.Name }}
-							</a>
-							{% endif %}
-						</li>
-						{% endfor %}
-					</ul>
-				</div>
-			</nav>
-			{% block content %}
-			{% endblock content %}
-		</div>
-		{% block modal %}
-		{% endblock modal %}
+{% block content %}
+{% endblock content %}
+
+{% block modal %}
+{% endblock modal %}
+
+<!-- Control Sidebar -->
+ <aside class="control-sidebar control-sidebar-dark">
+<!-- Control sidebar content goes here -->
+ </aside>
+<!-- /.control-sidebar -->
+
+<!-- Main Footer -->
+<footer class="main-footer">
+	<strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
+	All rights reserved.
+	<div class="float-right d-none d-sm-inline-block">
+		<b>Version</b> 3.1.0
 	</div>
-	
-	<script>
-		function stock_search(){
-			code = document.getElementById("stock_search").value.split(' ')[0];
-			location.assign("/stock/" + code + "/technical-chart/");
-		}
-		function autocomplete(inp, arr) {
-			/*the autocomplete function takes two arguments,
-			the text field element and an array of possible autocompleted values:*/
-			var currentFocus;
-			/*execute a function when someone writes in the text field:*/
-			inp.addEventListener("input", function(e) {
-				var a, b, i, val = this.value;
-				/*close any already open lists of autocompleted values*/
-				closeAllLists();
-				if (!val) {
-					return false;
-				}
-				currentFocus = -1;
-				/*create a DIV element that will contain the items (values):*/
-				a = document.createElement("DIV");
-				a.setAttribute("id", this.id + "autocomplete-list");
-				a.setAttribute("class", "autocomplete-items");
-				a.setAttribute("style", "height:300px;overflow-y:auto");
-				
-				/*append the DIV element as a child of the autocomplete container:*/
-				this.parentNode.appendChild(a);
-				/*for each item in the array...*/
-				for (i = 0; i < arr.length; i++) {
-					/*check if the item starts with the same letters as the text field value:*/
-					if (arr[i][0].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-						/*create a DIV element for each matching element:*/
-						b = document.createElement("DIV");
-						/*make the matching letters bold:*/
-						b.innerHTML = "<strong>" + arr[i][0].substr(0, val.length) + "</strong>";
-						b.innerHTML += arr[i][0].substr(val.length);
-						b.innerHTML += ' ' + arr[i][1];
-						/*insert a input field that will hold the current array item's value:*/
-						b.innerHTML += "<input type='hidden' value='" + arr[i][0] + ' ' + arr[i][1] + "'>";
-						/*execute a function when someone clicks on the item value (DIV element):*/
-						b.addEventListener("click", function(e) {
-							/*insert the value for the autocomplete text field:*/
-							inp.value = this.getElementsByTagName("input")[0].value;
-							/*close the list of autocompleted values,
-							(or any other open lists of autocompleted values:*/
-							closeAllLists();
-							stock_search();
-						});
-						a.appendChild(b);
-					}
-				}
-			});
-			/*execute a function presses a key on the keyboard:*/
-			inp.addEventListener("keydown", function(e) {
-				var x = document.getElementById(this.id + "autocomplete-list");
-				if (x)
-					x = x.getElementsByTagName("div");
-				if (e.keyCode == 40) {
-					/*If the arrow DOWN key is pressed,
-					increase the currentFocus variable:*/
-					currentFocus++;
-					/*and and make the current item more visible:*/
-					addActive(x);
-				} else if (e.keyCode == 38) { //up
-					/*If the arrow UP key is pressed,
-					decrease the currentFocus variable:*/
-					currentFocus--;
-					/*and and make the current item more visible:*/
-					addActive(x);
-				} else if (e.keyCode == 13) {
-					/*If the ENTER key is pressed, prevent the form from being submitted,*/
-					e.preventDefault();
-					if (currentFocus > -1) {
-						/*and simulate a click on the "active" item:*/
-						if (x)
-							x[currentFocus].click();
-					}
-				}
-			});
-			function addActive(x) {
-				/*a function to classify an item as "active":*/
-				if (!x) return false;
-				/*start by removing the "active" class on all items:*/
-				removeActive(x);
-				if (currentFocus >= x.length) currentFocus = 0;
-				if (currentFocus < 0) currentFocus = (x.length - 1);
-				/*add class "autocomplete-active":*/
-				x[currentFocus].classList.add("autocomplete-active");
-			}
-			function removeActive(x) {
-				/*a function to remove the "active" class from all autocomplete items:*/
-				for (var i = 0; i < x.length; i++) {
-					x[i].classList.remove("autocomplete-active");
-				}
-			}
-			function closeAllLists(elmnt) {
-				/*close all autocomplete lists in the document,
-				except the one passed as an argument:*/
-				var x = document.getElementsByClassName("autocomplete-items");
-				for (var i = 0; i < x.length; i++) {
-					if (elmnt != x[i] && elmnt != inp) {
-					x[i].parentNode.removeChild(x[i]);
-					}
-				}
-			}
-			/*execute a function when someone clicks in the document:*/
-			document.addEventListener("click", function (e) {
-				closeAllLists(e.target);
-			});
-		}
-		
-		/*An array containing all the country names in the world:*/
-		//var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua & Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia & Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre & Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts & Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Turks & Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
-		var stocks = {{ stocks|safe }};
-		/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
-		autocomplete(document.getElementById("stock_search"), stocks);
-	</script>
+</footer>
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
-	{% block script %}
-	{% endblock script %}
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- Bootstrap 5 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+<!-- DataTables  & Plugins -->
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+
+<script>
+$('#navbar-nav').find('a').each(function () {
+	if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
+		$(this).addClass('text-primary');
+	}
+});
+</script>
+
+{% block script %}
+{% endblock script %}
+
 </body>
-
 </html>

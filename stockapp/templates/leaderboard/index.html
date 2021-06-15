@@ -1,0 +1,232 @@
+{% extends 'base/dashboard.html' %}
+{% load humanize %}
+
+{% block mystyle %}
+{% endblock mystyle %}
+
+{% block sidebar %}
+<div class="sidebar">
+	<!-- Sidebar Menu -->
+	<nav class="mt-2">
+		<ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+			<!-- <li class="nav-item">
+				<a href="#new-group" class="nav-link" data-toggle="modal" data-target="#new-group">
+					<i class="far fa-circle nav-icon"></i>
+					<p>新增</p>
+				</a>
+			</li>
+			{% for group in group_list %}
+			<li class="nav-item">
+				<a href="/group/{{ group.id }}" class="nav-link">
+				<i class="far fa-circle nav-icon"></i>
+				<p>{{ group.Name }}</p>
+				</a>
+			</li>
+			{% endfor %} -->
+		</ul>
+	</nav>
+	<!-- /.sidebar-menu -->
+</div>
+<!-- /.sidebar -->
+{% endblock sidebar %}
+
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Content Header (Page header) -->
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-12 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
+					<h1 class="h2">排行榜
+						<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#upload_record">
+							上傳
+						</button>
+					</h1>
+				</div><!-- /.col -->
+				
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</div>
+	<!-- /.content-header -->
+
+	<div class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="card">
+						<div class="card-header text-primary">
+							買入排行榜
+						</div>
+						<div class="card-body">
+							<table class="table table-bordered table-striped" id="leader_buyin_table" style="width:100%">
+								<thead>
+									<tr>
+										<th>代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>天數</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for stock in leader_buyin_list %}
+									<tr>
+										<td>{{ stock.code }}</td>
+										<td>{{ stock.name }}</td>
+										<td>{{ stock.diff }}</td>
+										<td>{{ stock.days }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+								<tfoot>
+									<tr>
+										<th>代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>天數</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>		
+					<!-- /.card -->
+				</div>
+				<!-- /.col-md-6 -->
+				<div class="col-lg-12">
+					<div class="card">
+						<div class="card-header text-primary">
+							賣出排行榜
+						</div>
+						<div class="card-body">
+							<table class="table table-bordered table-striped" id="leader_sellout_table" style="width:100%">
+								<thead>
+									<tr>
+										<th>代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>天數</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for stock in leader_sellout_list %}
+									<tr>
+										<td>{{ stock.code }}</td>
+										<td>{{ stock.name }}</td>
+										<td>{{ stock.diff }}</td>
+										<td>{{ stock.days }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+								<tfoot>
+									<tr>
+										<th>代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>天數</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>		
+					<!-- /.card -->
+				</div>
+				<!-- /.col-md-6 -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+</div>
+<!-- /.content-wrapper -->
+{% endblock content %}
+
+{% block modal %}
+<div class="modal fade" id="upload_record" tabindex="-1" aria-labelledby="upload" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">上傳名單
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form enctype="multipart/form-data"  class="needs-validation" method="POST" action="" novalidate>
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<div class="mb-3">
+							<label for="upload" class="form-label" >上傳檔案</label>
+							<input class="form-control" type="file" accept=".csv" id="uploadfiles" name="uploadfiles" multiple>
+						  </div>
+					</div>
+					<button type="submit" id="upload_submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('upload_submit').click()">
+					上傳
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock modal %}
+
+{% block script %}
+<script>
+	$(document).ready( function () {
+		$("#leader_buyin_table").DataTable({
+			"responsive": true,
+			"lengthChange": true,
+			"autoWidth": false,
+			"order": [
+				[ 3, 'desc' ],
+				[ 2, "desc" ],
+			],
+			"buttons": [
+				{
+					extend: 'csv',
+					text: '下載CSV',
+					bom : true,
+					title: '買入排行榜'
+				},
+				{
+					extend: 'excel',
+					text: '下載Excel',
+					title: '買入排行榜'
+				},
+				{
+					extend: 'colvis',
+					text: '篩選',
+				}
+			]
+		}).buttons().container().appendTo('#leader_buyin_table_wrapper .col-md-6:eq(0)');
+
+		$("#leader_sellout_table").DataTable({
+			"responsive": true,
+			"lengthChange": true,
+			"autoWidth": false,
+			"order": [
+				[ 3, 'desc' ],
+				[ 2, "asc" ]
+			],
+			"buttons": [
+				{
+					extend: 'csv',
+					text: '下載CSV',
+					bom : true,
+					title: '賣出排行榜'
+				},
+				{
+					extend: 'excel',
+					text: '下載Excel',
+					title: '賣出排行榜'
+				},
+				{
+					extend: 'colvis',
+					text: '篩選',
+				}
+			]
+		}).buttons().container().appendTo('#leader_sellout_table_wrapper .col-md-6:eq(0)')
+	});
+</script>
+{% endblock script %}
