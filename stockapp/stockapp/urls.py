@@ -44,9 +44,6 @@ urlpatterns = [
     path('group/<int:group_id>/delete', group.delete),
     path('group/<int:group_id>/clear', group.clear),
     path('group/<int:group_id>/upload', group.upload),
-    path('group/<int:group_id>/download', group.download),
-    path('group/<int:group_id>/add-broker/', group.add_broker),
-    path('group/<int:group_id>/del-broker/<int:broker_id>', group.del_broker),
 
     path('stock/', stock.base),
     path('stock/create/', stock.create),

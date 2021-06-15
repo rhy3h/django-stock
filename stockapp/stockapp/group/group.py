@@ -160,58 +160,25 @@ def delete(request, group_id):
     return redirect('/group/')
 
 @login_required
-def add_broker(request, group_id):
-    if request.method == "POST":
-        User = request.user
-        group = Group.objects.filter(Owner=User).get(id = group_id)
-        broker = str(request.POST['select-broker'])
-        branch = str(request.POST['select-branch'])
-        
-        Broker.objects.get_or_create(Group = group,
-                                Name = get_id_name(branch).name,
-                                Broker = broker,
-                                Branch = branch)
-        
-        return redirect('/group/' + str(group_id))
-
-@login_required
-def del_broker(request, group_id, broker_id):
-    User = request.user
-    group = Group.objects.filter(Owner = User).get(id = group_id)
-    broker = Broker.objects.filter(Group = group).get(id = broker_id)
-    broker.delete()
-    
-    return redirect('/group/' + str(group_id))
-
-@login_required
-def download(request, group_id):
-    User = request.user
-    group = Group.objects.filter(Owner = User).get(id = group_id)
-    broker_list = Broker.objects.filter(Group = group)
-
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment;filename={}".format(escape_uri_path(group.Name + ".csv"))
-    response.write(codecs.BOM_UTF8)
-    writer = csv.writer(response)
-
-    for broker in broker_list:
-        writer.writerow([broker.Name])
-
-    return response
-
-@login_required
 def upload(request, group_id):
     User = request.user
     group = Group.objects.filter(Owner = User).get(id = group_id)
     
     if request.method == "POST":
         uploadfile = request.FILES['uploadfile']
+        branch_names = []
         for line in uploadfile:
             string = line.decode("utf-8-sig")
-            name = string.split(',')[0].replace("\r\n","")
+            string_data = string.split(',')[1]
+            branch_names.append(string_data)
+        
+        for name in branch_names[1:]:
+            if name[0] == '奔':
+                name = '(牛牛牛)' + name[1:]
             broker_branch = get_branch(name)
             Broker.objects.get_or_create(Group = group,
                                 Name = name,
                                 Broker = broker_branch[0],
                                 Branch = broker_branch[1])
+    
     return redirect('/group/' + str(group_id))

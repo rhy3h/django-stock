@@ -12,16 +12,27 @@
 {% endblock mystyle %}
 
 {% block sidebar %}
+<!-- Sidebar -->
 <div class="sidebar">
+	<!-- Sidebar user (optional) -->
+	<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+		<div class="image">
+			
+		</div>
+		<div class="info">
+			<a href="#" class="d-block">{{ User }}</a>
+		</div>
+	</div>
+
 	<!-- Sidebar Menu -->
 	<nav class="mt-2">
-		<ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+		<ul  id="sidebar"  class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 			<li class="nav-item">
 				<a href="#new-group" class="nav-link" data-bs-toggle="modal" data-bs-target="#new-group">
 					<i class="far fa-circle nav-icon"></i>
 					<p>新增券商群組</p>
 				</a>
-			</li>
+			</li>	 
 			{% for group in group_list %}
 			<li class="nav-item">
 				<a href="/group/{{ group.id }}" class="nav-link">
@@ -34,9 +45,15 @@
 	</nav>
 	<!-- /.sidebar-menu -->
 </div>
+<!-- /.sidebar -->
+
+<div class="sidebar-custom">
+	<a href="#positive"class="btn btn-secondary hide-on-collapse">買入</a>
+	<a href="#negative" class="btn btn-secondary hide-on-collapse pos-right">賣出</a>
+</div>
+<!-- /.sidebar-custom -->
 {% endblock sidebar %}
 
-<!-- /.sidebar -->
 {% block content %}
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -55,7 +72,7 @@
 					</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
-					<a href="javascript:Crawler_GoodInfo()" class="btn btn-outline-danger">
+					<a href="javascript:Crawler_GoodInfo()" class="btn btn-outline-warning">
 						同步
 					</a>
 				</div>
@@ -81,9 +98,6 @@
 			</div><!-- /.row -->
 
 			<h3 class="h3 pt-3">券商清單
-				<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-broker">
-					新增
-				</a>
 				<a class="btn btn-outline-danger" href="clear">
 					清除
 				</a>
@@ -98,11 +112,6 @@
 				{% for broker in broker_list %}
 				<h6 class="fs-4 col-xxl-2 col-xl-3 col-lg-4 col-sm-6 d-flex justify-content-between align-items-center">
 					<span class="fs-5">{{ broker.Name }}</span>
-					<a class="btn btn-outline-danger" href="del-broker/{{ broker.id }}">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-							<path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/>
-						</svg>
-					</a>
 				</h6>
 				{% endfor %}
 			</div>
@@ -113,7 +122,7 @@
 	<div class="content">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-12">
+				<div class="col-lg-12" id="positive">
 					<div class="card">
 						<div class="card-header text-primary">
 							買入
@@ -173,7 +182,7 @@
 				</div>
 				<!-- /.col-md-6 -->
 
-				<div class="col-lg-12">
+				<div class="col-lg-12" id="negative">
 					<div class="card">
 						<div class="card-header text-primary">
 							賣出
@@ -253,7 +262,7 @@
 				<form class="needs-validation" method="POST" action="/group/create/" novalidate>
 				{% csrf_token %}
 					<div class="form-floating mb-3">
-						<input type="text" class="form-control" id="group-name" name="group-name" placeholder="新名稱" required>
+						<input type="text" class="form-control" id="group-name" name="group-name" placeholder="新名稱" autocomplete="off" required>
 						<label for="group-name">群組名稱</label>
 					</div>
 					<div class="modal-footer">
@@ -278,7 +287,7 @@
 				<form class="needs-validation" method="POST" action="edit" novalidate>
 				{% csrf_token %}
 					<div class="form-floating mb-3">
-						<input type="text" class="form-control" id="new-group-name" name="new-group-name" value="{{ group.Name }}" placeholder="新名稱" required>
+						<input type="text" class="form-control" id="new-group-name" name="new-group-name" value="{{ group.Name }}" placeholder="新名稱" autocomplete="off" required>
 						<label for="new-group-name">新名稱</label>
 					</div>
 					<div class="modal-footer">
@@ -287,57 +296,6 @@
 						</button>
 					</div>
 				</form>
-			</div>
-			
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="add-broker" tabindex="-1" aria-labelledby="add_broker" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">新增券商</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<form class="needs-validation" method="POST" action="add-broker/" novalidate>
-				{% csrf_token %}
-					<div class="row">
-						<div class="col-sm-6">
-							<div class="input-group mb-3">
-								<input id="input_broker" type="text" class="form-control" placeholder="券商" aria-label="Stock" aria-describedby="basic-addon1">
-							</div>
-						</div>
-						<div class="col-sm-6">
-							<div class="input-group mb-3">
-								<input id="input_branch" type="text" class="form-control" placeholder="分部" aria-label="Stock" aria-describedby="basic-addon1">
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-6">
-							<select class="form-select mb-3" id="select-broker" name="select-broker" onchange="generate_branch_list()">
-								<script>
-									generate_broker_list();
-								</script>
-							</select>
-						</div>
-						<div class="col-sm-6">
-							<select class="form-select mb-3" id="select-branch" name="select-branch">
-								<script>
-									generate_branch_list();
-								</script>
-							</select>
-						</div>
-					</div>
-					<button class="" type="submit" id="add_broker_submit" hidden>Continue to checkout</button>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add_broker_submit').click()">
-					確認
-				</button>
 			</div>
 		</div>
 	</div>
@@ -512,12 +470,7 @@
 					extend: 'csv',
 					text: '下載CSV',
 					bom : true,
-					title: '{{ group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
-				},
-				{
-					extend: 'excel',
-					text: '下載Excel',
-					title: '{{ group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
+					title: '{{ group.Name }} 買入' + ' ' + begin_date + ' ' + end_date
 				},
 				{
 					extend: 'colvis',
@@ -559,11 +512,6 @@
 					extend: 'csv',
 					text: '下載CSV',
 					bom : true,
-					title: '{{ group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
-				},
-				{
-					extend: 'excel',
-					text: '下載Excel',
 					title: '{{ group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
 				},
 				{

@@ -73,7 +73,7 @@
 									<tr>
 										<td>{{ stock.code }}</td>
 										<td>{{ stock.name }}</td>
-										<td>{{ stock.diff }}</td>
+										<td>{{ stock.diff|intcomma }}</td>
 										<td>{{ stock.days }}</td>
 									</tr>
 									{% endfor %}
@@ -112,7 +112,7 @@
 									<tr>
 										<td>{{ stock.code }}</td>
 										<td>{{ stock.name }}</td>
-										<td>{{ stock.diff }}</td>
+										<td>{{ stock.diff|intcomma }}</td>
 										<td>{{ stock.days }}</td>
 									</tr>
 									{% endfor %}

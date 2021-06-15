@@ -19,8 +19,13 @@ def index(request):
         for line in file:
             string = line.decode("utf-8-sig").replace('\"', '').replace('\n', '').split(',')
             if string[0] != '股票代碼':
-                stock = Stock(string[0], string[1], int(string[2]))
-                
+                code = string[0]
+                name = string[1]
+                diff = ""
+                for item in string[2:-3]:
+                    diff += item.replace(' ', '')
+                stock = Stock(code, name, int(diff))
+
                 if stock.diff > 0:
                     flag_index = False
                     for item in leader_buyin_list:
@@ -44,6 +49,4 @@ def index(request):
                     else:
                         leader_sellout_list.append(stock)
 
-                
-    
     return render(request, 'leaderboard/index.html', locals())
