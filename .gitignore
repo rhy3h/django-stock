@@ -2,5 +2,3 @@
 *.pyc
 stockapp/__pycache__
 stockapp/db.sqlite3
-#stockapp/stockapp/secret_settings.py
-Update.bat

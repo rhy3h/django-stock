@@ -42,7 +42,6 @@ urlpatterns = [
     path('group/<int:group_id>/sync/', group.sync),
     path('group/<int:group_id>/edit', group.edit),
     path('group/<int:group_id>/delete', group.delete),
-    path('group/<int:group_id>/clear', group.clear),
     path('group/<int:group_id>/upload', group.upload),
 
     path('stock/', stock.base),

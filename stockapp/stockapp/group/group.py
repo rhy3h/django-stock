@@ -140,17 +140,6 @@ def edit(request, group_id):
     return redirect('/group/' + str(group_id))
 
 @login_required
-def clear(request, group_id):
-    User = request.user
-    group_list = Group.objects.filter(Owner=User)
-    group = group_list.get(id = group_id)
-    broker_list = Broker.objects.filter(Group = group)
-    for broker in broker_list:
-        broker.delete()
-
-    return redirect('/group/' + str(group_id))
-
-@login_required
 def delete(request, group_id):
     User = request.user
     group = Group.objects.get(Owner = User,
@@ -163,8 +152,12 @@ def delete(request, group_id):
 def upload(request, group_id):
     User = request.user
     group = Group.objects.filter(Owner = User).get(id = group_id)
+    broker_list = Broker.objects.filter(Group = group)
     
     if request.method == "POST":
+        for broker in broker_list:
+            broker.delete()
+
         uploadfile = request.FILES['uploadfile']
         branch_names = []
         for line in uploadfile:
