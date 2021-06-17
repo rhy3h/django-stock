@@ -1,6 +1,8 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from ..wantgoo.institutional_investors import institutional_investors_data, stock_append_data
+
+import csv
 
 class Stock:
     def __init__(self, code, name, diff):
@@ -9,8 +11,10 @@ class Stock:
         self.diff = diff
         self.date = []
         self.days = None
+        self.sumForeign = None
+        self.sumING = None
+        self.sumDealer = None
 
-import csv
 @login_required
 def index(request):
     User = request.user
@@ -18,13 +22,13 @@ def index(request):
     leader_buyin_list = []
     leader_sellout_list = []
     buyin_date = []
-    sell_date = []
+    sellout_date = []
     for file in request.FILES.getlist('uploadfiles'):
         file_date = file.name.split(' ')[-1][:-4]
         if file.name.split(' ')[1] == '買入':
             buyin_date.append(file_date)
         else:
-            sell_date.append(file_date)
+            sellout_date.append(file_date)
         decoded_file = file.read().decode('utf-8-sig').replace('\t', '').splitlines()
         csv_data = csv.DictReader(decoded_file)
         
@@ -59,18 +63,32 @@ def index(request):
                     leader_sellout_list.append(stock)
     
     buyin_date.reverse()
-    sell_date.reverse()
-    for item in leader_buyin_list:
-        item.date.reverse()
+    sellout_date.reverse()
+    
+    i = 0
+    while i < len(leader_buyin_list):
+        leader_buyin_list[i].date.reverse()
         day = 0
-        while day < len(item.date) and item.date[day] == buyin_date[day]:
+        while day < len(leader_buyin_list[i].date) and leader_buyin_list[i].date[day] == buyin_date[day]:
             day += 1
-        item.days = day
-    for item in leader_sellout_list:
-        item.date.reverse()
+        leader_buyin_list[i].days = day
+        if day == 0:
+            leader_buyin_list.remove(leader_buyin_list[i])
+            i -= 1
+        stock_append_data(leader_buyin_list[i], leader_buyin_list[i].date[0])
+        i += 1
+    
+    i = 0
+    while i < len(leader_sellout_list):
+        leader_sellout_list[i].date.reverse()
         day = 0
-        while day < len(item.date) and item.date[day] == sell_date[day]:
+        while day < len(leader_sellout_list[i].date) and leader_sellout_list[i].date[day] == sellout_date[day]:
             day += 1
-        item.days = day
+        leader_sellout_list[i].days = day
+        if day == 0:
+            leader_sellout_list.remove(leader_sellout_list[i])
+            i -= 1
+        stock_append_data(leader_sellout_list[i], leader_sellout_list[i].date[0])
+        i += 1
     
     return render(request, 'leaderboard/index.html', locals())

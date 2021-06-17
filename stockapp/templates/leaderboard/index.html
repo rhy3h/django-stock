@@ -72,21 +72,21 @@
 										<th>名稱</th>
 										<th>差額(仟元)</th>
 										<th>天數</th>
-										<th>日期</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
 									</tr>
 								</thead>
 								<tbody>
 									{% for stock in leader_buyin_list %}
 									<tr>
-										<td>{{ stock.code }}</td>
+										<td><a href="javascript:SearchWantGoo({{ stock.code }}, '{{ buyin_date.0 }}')">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>{{ stock.days }}</td>
-										<td>
-											{% for date in stock.date %}
-											{{ date }}<br>
-											{% endfor %}
-										</td>
+										<td>{{ stock.sumForeign }}</td>
+										<td>{{ stock.sumING }}</td>
+										<td>{{ stock.sumDealer }}</td>
 									</tr>
 									{% endfor %}
 								</tbody>
@@ -96,7 +96,9 @@
 										<th>名稱</th>
 										<th>差額(仟元)</th>
 										<th>天數</th>
-										<th>日期</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
 									</tr>
 								</tfoot>
 							</table>
@@ -118,21 +120,21 @@
 										<th>名稱</th>
 										<th>差額(仟元)</th>
 										<th>天數</th>
-										<th>日期</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
 									</tr>
 								</thead>
 								<tbody>
 									{% for stock in leader_sellout_list %}
 									<tr>
-										<td>{{ stock.code }}</td>
+										<td><a href="javascript:SearchWantGoo({{ stock.code }}, '{{ sellout_date.0 }}')">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>{{ stock.days }}</td>
-										<td>
-											{% for date in stock.date %}
-											{{ date }}<br>
-											{% endfor %}
-										</td>
+										<td>{{ stock.sumForeign }}</td>
+										<td>{{ stock.sumING }}</td>
+										<td>{{ stock.sumDealer }}</td>
 									</tr>
 									{% endfor %}
 								</tbody>
@@ -142,7 +144,9 @@
 										<th>名稱</th>
 										<th>差額(仟元)</th>
 										<th>天數</th>
-										<th>日期</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
 									</tr>
 								</tfoot>
 							</table>
@@ -191,6 +195,31 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="SearchWantGoo" tabindex="-1" aria-labelledby="SearchWantGoo" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="GoodInfoText">玩股網</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table id="GoodInfoTable" class="table table-striped">
+					<thead>
+						<tr>
+							<th>日期</th>
+							<th>外資</th>
+							<th>投信</th>
+							<th>自營商</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock modal %}
 
 {% block script %}
@@ -198,6 +227,43 @@
 	function download(){
 		$("#download-buyin-leaderboard-button").click();
 		$("#download-sellout-leaderboard-button").click();
+	}
+
+	function SearchWantGoo(stock_id, end_date){
+		$.ajax({
+			url: '/apis/institutional_investors/' + stock_id + '/' + end_date,
+			data: {
+			},
+			dataType: 'json',
+			success: function (data) {
+				$("#GoodInfoTable tbody").empty();
+				for(let i = 1; i < data.length; i++){
+					text =
+						"<tr>" + 
+						"<th>" + data[i][0] + "</th>" + 
+						"<th>" + data[i][1] + "</th>" + 
+						"<th>" + data[i][2] + "</th>" + 
+						"<th>" + data[i][3] + "</th>" + 
+					"</tr>";
+					
+					$("#GoodInfoTable tbody").append(
+						text
+					);
+				}
+				
+				$("#GoodInfoTable th").each(function () 
+				{
+					if( Number($(this).text()) > 0){
+						$(this).css("color", "red");
+					}
+					else if(Number($(this).text()) < 0){
+						$(this).css("color", "green");
+					}
+				});
+				$("#GoodInfoText").text(stock_id);
+				$('#SearchWantGoo').modal('show');
+			}
+		});
 	}
 	
 	$(document).ready( function () {
