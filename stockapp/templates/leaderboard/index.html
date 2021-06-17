@@ -45,6 +45,9 @@
 						<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#upload_record">
 							上傳
 						</button>
+						<button type="button" class="btn btn-outline-danger" onclick="download()">
+							下載
+						</button>
 					</h1>
 				</div><!-- /.col -->
 				
@@ -192,6 +195,11 @@
 
 {% block script %}
 <script>
+	function download(){
+		$("#download-buyin-leaderboard-button").click();
+		$("#download-sellout-leaderboard-button").click();
+	}
+	
 	$(document).ready( function () {
 		$("#leader_buyin_table").DataTable({
 			"language": {
@@ -227,6 +235,9 @@
 				{
 					extend: 'csv',
 					text: '下載CSV',
+					attr: {
+						id: 'download-buyin-leaderboard-button'
+					},
 					bom : true,
 					title: '買入排行榜'
 				},
@@ -271,6 +282,9 @@
 				{
 					extend: 'csv',
 					text: '下載CSV',
+					attr: {
+						id: 'download-sellout-leaderboard-button'
+					},
 					bom : true,
 					title: '賣出排行榜'
 				},

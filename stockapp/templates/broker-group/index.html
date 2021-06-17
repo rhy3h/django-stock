@@ -71,6 +71,9 @@
 						<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-broker-group">
 							刪除
 						</a>
+						<button type="button" class="btn btn-outline-primary" onclick="download()">
+							下載
+						</button>
 					</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
@@ -133,8 +136,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th colspan="2">買進</th>
-										<th colspan="2">賣出</th>
+										<th>買進</th>
+										<th>賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -148,22 +151,12 @@
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>
 										{% for buy in stock.buyin %}
-										{{ buy.name }}<br>
-										{% endfor %}
-										</td>
-										<td>
-										{% for buy in stock.buyin %}
-										{{ buy.diff|intcomma }}<br>
+										{{ buy.name }}: {{ buy.diff|intcomma }}<br>
 										{% endfor %}
 										</td>
 										<td>
 										{% for sell in stock.sellout %}
-										{{ sell.name }}<br>
-										{% endfor %}
-										</td>
-										<td>
-										{% for sell in stock.sellout %}
-										{{ sell.diff|intcomma }}<br>
+										{{ sell.name }}: {{ sell.diff|intcomma }}<br>
 										{% endfor %}
 										</td>
 										<td>{{ stock.sumForeign }}</td>
@@ -177,8 +170,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th colspan="2">買進</th>
-										<th colspan="2">賣出</th>
+										<th>買進</th>
+										<th>賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -203,8 +196,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th colspan="2">買進</th>
-										<th colspan="2">賣出</th>
+										<th>買進</th>
+										<th>賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -218,22 +211,12 @@
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>
 										{% for buy in stock.buyin %}
-										{{ buy.name }}<br>
-										{% endfor %}
-										</td>
-										<td>
-										{% for buy in stock.buyin %}
-										{{ buy.diff|intcomma }}<br>
+										{{ buy.name }}: {{ buy.diff|intcomma }}<br>
 										{% endfor %}
 										</td>
 										<td>
 										{% for sell in stock.sellout %}
-										{{ sell.name }}<br>
-										{% endfor %}
-										</td>
-										<td>
-										{% for sell in stock.sellout %}
-										{{ sell.diff|intcomma }}<br>
+										{{ sell.name }}: {{ sell.diff|intcomma }}<br>
 										{% endfor %}
 										</td>
 										<td>{{ stock.sumForeign }}</td>
@@ -247,8 +230,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th colspan="2">買進</th>
-										<th colspan="2">賣出</th>
+										<th>買進</th>
+										<th>賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -482,7 +465,12 @@
 			}
 		});
 	}
-
+	
+	function download(){
+		$("#download-buyin-button").click();
+		$("#download-sellout-button").click();
+	}
+	
 	$(document).ready( function () {
 		begin_date = document.getElementById("begin-date").value;
 		end_date = document.getElementById("end-date").value;
@@ -519,8 +507,11 @@
 				{
 					extend: 'csv',
 					text: '下載CSV',
+					attr: {
+						id: 'download-buyin-button'
+					},
 					bom : true,
-					title: '{{ broker_group.Name }} 買入' + ' ' + begin_date + ' ' + end_date
+					title: '{{ broker_group.Name }} 買入' + ' ' + begin_date + ' ' + end_date,
 				},
 				{
 					extend: 'colvis',
@@ -561,6 +552,9 @@
 				{
 					extend: 'csv',
 					text: '下載CSV',
+					attr: {
+						id: 'download-sellout-button'
+					},
 					bom : true,
 					title: '{{ broker_group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
 				},

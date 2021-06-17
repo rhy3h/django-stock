@@ -49,7 +49,7 @@ def write_csv(path, stock):
 
 @login_required
 def sync(request, group_id):
-    stock_list = read_csv('stockapp/stock_list.csv')
+    stock_list = read_csv('stockapp/files/stock_list.csv')
     path = 'stockapp/csv/'
     length = len(stock_list)
     count = 1
