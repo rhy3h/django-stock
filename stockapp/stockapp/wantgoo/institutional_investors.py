@@ -100,15 +100,15 @@ def continuous(stock_data):
     return data
 
 def stock_append_data(item, end_date):
-    stock_id = item['id']
+    stock_id = item.code
     if len(stock_id) == 5:
         return item
     try:
         stock_data = read_csv('stockapp/csv/' + stock_id + '.csv', end_date)
         count = continuous(stock_data[1:])
-        item['sumForeign'] = count['sumForeign']
-        item['sumING'] = count['sumING']
-        item['sumDealer'] = count['sumDealer']
+        item.sumForeign = count['sumForeign']
+        item.sumING = count['sumING']
+        item.sumDealer = count['sumDealer']
     except:
         pass
     

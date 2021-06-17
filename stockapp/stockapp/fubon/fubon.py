@@ -4,9 +4,11 @@ from .fubon_list import *
 from bs4 import BeautifulSoup
 
 class Branch:
-    def __init__(self, id, name):
+    def __init__(self, id, name, diff):
         self.id = id
         self.name = name
+        self.diff = diff
+    
 
 def get_branch(name):
     for item in g_BrokerList.split(';'):
@@ -19,31 +21,15 @@ def get_branch(name):
     
     return [broker_id, branch_id]
 
-def get_id_name(broker_id):
+def get_id_name(broker_id, diff):
     find_index = g_BrokerList.find(broker_id) + len(broker_id) + 1
     find_colon_index = g_BrokerList[find_index:].find(';')
     find_exclamation_index = g_BrokerList[find_index:].find('!')
 
     if find_colon_index != -1 and find_colon_index < find_exclamation_index:
-        return Branch(broker_id, g_BrokerList[find_index : find_index + find_colon_index])
+        return Branch(broker_id, g_BrokerList[find_index : find_index + find_colon_index], diff)
     else:
-        return Branch(broker_id, g_BrokerList[find_index : find_index + find_exclamation_index])
-
-class Stock:
-    def __init__(self, array, branch):
-        try:
-            self.id = array[0].split(',')[0][2:]
-            self.name = array[0].split(',')[1]
-        except:
-            self.id = array[0][0:5]
-            self.name = array[0][5:]
-        self.buy_in = int(array[1].replace(',', ''))
-        self.sell_out = int(array[2].replace(',', ''))
-        self.diff = int(array[3].replace(',', ''))
-        self.branch = [branch]
-    
-    def __lt__(self, other):
-        return self.diff < other.diff
+        return Branch(broker_id, g_BrokerList[find_index : find_index + find_exclamation_index], diff)
 
 def split_name(array):
     try:
@@ -56,110 +42,91 @@ def split_name(array):
 
 def fubon_get_list(broker_branch, begin_date, end_date):
     stock_list = {'positive':[], 'negative':[]}
-
-    for item in broker_branch:
-        fubon_list = fubon_crawler(item[0], item[1], begin_date, end_date)
-        for fubon in fubon_list:
-            id = split_name(fubon[0])[0]
-            name = split_name(fubon[0])[1]
-            buy_in = int(fubon[1].replace(',', ''))
-            sell_out = int(fubon[2].replace(',', ''))
-            diff = int(fubon[3].replace(',', ''))
-            test = {
-                'id': id,
-                'name': name,
-                'diff': diff,
-                'branch': [get_id_name(item[1]).name + ": " + str(diff)],
-            }
-            if test['diff'] >= 0:
-                stock_list['positive'].append(test)
-            else:
-                stock_list['negative'].append(test)
     
-    stock_list['positive'] = custom_sort_list(stock_list['positive'])
-    stock_list['negative'] = custom_sort_list(stock_list['negative'])
+    for branch in broker_branch:
+        broker_id = branch[0]
+        branch_id = branch[1]
+        fubon_list = fubon_crawler(broker_id, branch_id, begin_date, end_date)
+        for data in fubon_list:
+            temp = {
+                '股票代碼': data['股票代碼'],
+                '股票名稱': data['股票名稱'],
+                '差額': data['差額'],
+                '券商分部': get_id_name(branch_id, data['差額'])
+            }
+            if temp['差額'] >= 0:
+                stock_list['positive'].append(temp)
+            else:
+                stock_list['negative'].append(temp)
     
     stock_list = merge_list(stock_list)
-
-    stock_list['positive'].sort(key=lambda k: (k.get('diff', 0)), reverse=True)
-    stock_list['negative'].sort(key=lambda k: (k.get('diff', 0)))
-
+    
     return stock_list
+
+class Stock:
+    def __init__(self, code, name, diff):
+        self.code = code
+        self.name = name
+        self.diff = diff
+        self.buyin = []
+        self.sellout = []
+        self.sumForeign = None
+        self.sumING = None
+        self.sumDealer = None
 
 def merge_list(stock_list):
     data = {'positive':[], 'negative':[]}
+    
+    for i in range(len(stock_list['positive'])):
+        if stock_list['positive'][i] != None:
+            stock_code = stock_list['positive'][i]['股票代碼']
+            stock_name = stock_list['positive'][i]['股票名稱']
+            diff = stock_list['positive'][i]['差額']
+            temp = Stock(stock_code, stock_name, diff)
+            temp.buyin.append(stock_list['positive'][i]['券商分部'])
 
-    for positive in stock_list['positive']:
-        for negative in stock_list['negative']:
-            if positive['id'] == negative['id']:
-                temp = {
-                    'id': None,
-                    'name': None,
-                    'diff': None,
-                    'buy_in': "",
-                    'sell_out': "",
-                    'sumForeign': None,
-                    'sumING': None,
-                    'sumDealer': None,
-                }
-                temp['id'] = positive['id']
-                temp['name'] = positive['name']
-                temp['diff'] = positive['diff'] + negative['diff']
-                temp['buy_in'] = positive['branch']
-                temp['sell_out'] = negative['branch']
-                
-                if temp['diff'] > 0:
-                    data['positive'].append(temp)
-                else:
-                    data['negative'].append(temp)
-                
-                positive['id'] = None
-                negative['id'] = None
-                break
+            for j in range(len(stock_list['negative'])):
+                try:
+                    if stock_list['positive'][i]['股票代碼'] == stock_list['negative'][j]['股票代碼']:
+                        temp.diff += stock_list['negative'][j]['差額']
+                        temp.sellout.append(stock_list['negative'][j]['券商分部'])
+                        stock_list['negative'][j] = None
+                except:
+                    pass
+            for k in range(i + 1, len(stock_list['positive'])):
+                try:
+                    if stock_list['positive'][i]['股票代碼'] == stock_list['positive'][k]['股票代碼']:
+                        temp.diff += stock_list['positive'][k]['差額']
+                        temp.buyin.append(stock_list['positive'][k]['券商分部'])
+                        stock_list['positive'][k] = None
+                except:
+                    pass
+            stock_list['positive'][i] = None
+        
+            if temp.diff > 0:
+                data['positive'].append(temp)
+            else:
+                data['negative'].append(temp)
     
-    for positive in stock_list['positive']:
-        if positive['id'] != None:
-            temp = {
-                'id': positive['id'],
-                'name': positive['name'],
-                'diff': positive['diff'],
-                'buy_in': positive['branch'],
-                'sell_out': None,
-                'sumForeign': None,
-                'sumING': None,
-                'sumDealer': None,
-            }
-            data['positive'].append(temp)
-    
-    for negative in stock_list['negative']:
-        if negative['id'] != None:
-            temp = {
-                'id': negative['id'],
-                'name': negative['name'],
-                'diff': negative['diff'],
-                'buy_in': None,
-                'sell_out': negative['branch'],
-                'sumForeign': None,
-                'sumING': None,
-                'sumDealer': None,
-            }
-            
+    for i in range(len(stock_list['negative'])):
+        if stock_list['negative'][i] != None:
+            stock_code = stock_list['negative'][i]['股票代碼']
+            stock_name = stock_list['negative'][i]['股票名稱']
+            diff = stock_list['negative'][i]['差額']
+            temp = Stock(stock_code, stock_name, diff)
+            temp.sellout.append(stock_list['negative'][i]['券商分部'])
             data['negative'].append(temp)
+            stock_list['negative'][i] = None
+    
+    for positive in data['positive']:
+        positive.buyin.sort(key=lambda k: (k.diff, 0), reverse=True)
+        positive.sellout.sort(key=lambda k: (k.diff, 0))
+    
+    for negative in data['negative']:
+        negative.buyin.sort(key=lambda k: (k.diff, 0), reverse=True)
+        negative.sellout.sort(key=lambda k: (k.diff, 0))
     
     return data
-
-def custom_sort_list(to_do_list):
-    for i in range(len(to_do_list)):
-        for j in range(i + 1, len(to_do_list)):
-            try:
-                if to_do_list[i]['id'] == to_do_list[j]['id']:
-                    to_do_list[i]['branch'].append(to_do_list[j]['branch'][0])
-                    to_do_list[i]['diff'] += to_do_list[j]['diff']
-                    del to_do_list[j]
-            except:
-                pass
-    
-    return to_do_list
 
 def fubon_crawler(broker, branch, begin_date, end_date):
     url = "https://fubon-ebrokerdj.fbs.com.tw/z/zg/zgb/zgb0.djhtm?a=" + broker + "&b=" + branch + "&c=B&e=" + begin_date + "&f=" + end_date
@@ -170,27 +137,35 @@ def fubon_crawler(broker, branch, begin_date, end_date):
     stock_name = soup.find_all('td', class_="t4t1")
     stock_price = soup.find_all('td', class_="t3n1")
 
-    index_name = 0
-    index_price = 0
-
     stock_list = []
+    
     try:
-        while index_name < len(stock_name):
-            tmp_list= []
+        for i in range(len(stock_name)):
+            first_index = stock_name[i].script.string.find('\'')
+            last_index = stock_name[i].script.string.rfind('\'') + 1
+            code_name = stock_name[i].script.string[first_index:last_index].replace('\'', '')
+            temp = {
+                '股票代碼': None,
+                '股票名稱': None,
+                '買進金額': None,
+                '賣出金額': None,
+                '差額' : None
+            }
             try:
-                first_index = stock_name[index_name].script.string.find('\'')
-                last_index = stock_name[index_name].script.string.rfind('\'') + 1
-                tmp_list.append(stock_name[index_name].script.string[first_index:last_index].replace('\'', ''))
+                first_index = stock_name[i].script.string.find('\'')
+                last_index = stock_name[i].script.string.rfind('\'') + 1
+                code_name = stock_name[i].script.string[first_index:last_index].replace('\'', '')
+                temp['股票代碼'] = code_name.split(',')[0][2:]
+                temp['股票名稱'] = code_name.split(',')[1]
             except:
-                tmp_list.append(stock_name[index_name].a.string)
-                
-            cnt = 0
-            while cnt < 3:
-                tmp_list.append(stock_price[index_price].string)
-                index_price += 1
-                cnt += 1
-            index_name += 1
-            stock_list.append(tmp_list.copy())
+                temp['股票代碼'] = None
+                temp['股票名稱'] = stock_name[i].a.string.split(',')[1]
+            
+            temp['買進金額'] = stock_price[i * 3 + 0].string
+            temp['賣出金額'] = stock_price[i * 3 + 1].string
+            temp['差額'] = int(stock_price[i * 3 + 2].string.string.replace(',', ''))
+            
+            stock_list.append(temp)
     except:
         pass
     

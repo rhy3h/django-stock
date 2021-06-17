@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_REDIRECT_URL = "/group"
+LOGIN_REDIRECT_URL = "/broker-group"
 
 # Application definition
 

@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Group(models.Model):
+class BrokerGroup(models.Model):
     Owner = models.ForeignKey(User, on_delete=models.CASCADE)
     Name = models.TextField(blank=False)
 
@@ -9,8 +9,13 @@ class StockGroup(models.Model):
     Owner = models.ForeignKey(User, on_delete=models.CASCADE)
     Name = models.TextField(blank=False)
 
+class Stock(models.Model):
+    StockGroup = models.ForeignKey(StockGroup, on_delete=models.CASCADE)
+    Code = models.TextField(blank=False)
+    Name = models.TextField(blank=False)
+
 class Broker(models.Model):
-    Group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    BrokerGroup = models.ForeignKey(BrokerGroup, on_delete=models.CASCADE)
     Name = models.TextField(blank=False)
     Broker = models.TextField(blank=False)
     Branch = models.TextField(blank=False)

@@ -19,8 +19,8 @@ from django.conf.urls import url
 from django.contrib.auth.views import LoginView
 from . import views, apis, accounts
 from .cover import cover
-from .group import group
-from .stock import stock
+from .broker_group import broker_group
+from .stock_group import stock_group
 from .leaderboard import leaderboard
 
 handler404 = views.page_not_found
@@ -36,20 +36,20 @@ urlpatterns = [
 
     path('header/', views.header),
 
-    path('group/', group.base),
-    path('group/create/', group.create),
-    path('group/<int:group_id>/', group.index),
-    path('group/<int:group_id>/sync/', group.sync),
-    path('group/<int:group_id>/edit', group.edit),
-    path('group/<int:group_id>/delete', group.delete),
-    path('group/<int:group_id>/upload', group.upload),
-
-    path('stock/', stock.base),
-    path('stock/create/', stock.create),
-    path('stock/<int:group_id>/', stock.index),
-    path('stock/<int:group_id>/edit', stock.edit),
-    path('stock/<int:group_id>/delete', stock.delete),
-    path('stock/<int:group_id>/technical-chart/', stock.technical_chart),
+    path('broker-group/', broker_group.base),
+    path('broker-group/create/', broker_group.create),
+    path('broker-group/<int:group_id>/', broker_group.index),
+    path('broker-group/<int:group_id>/edit', broker_group.edit),
+    path('broker-group/<int:group_id>/delete', broker_group.delete),
+    path('broker-group/<int:group_id>/upload', broker_group.upload),
+    path('broker-group/<int:group_id>/sync/', broker_group.sync),
+    
+    path('stock-group/', stock_group.base),
+    path('stock-group/create/', stock_group.create),
+    path('stock-group/<int:group_id>/', stock_group.index),
+    path('stock-group/<int:group_id>/add', stock_group.add),
+    path('stock-group/<int:group_id>/edit', stock_group.edit),
+    path('stock-group/<int:group_id>/delete', stock_group.delete),
 
     path('leaderboard/', leaderboard.index),
 

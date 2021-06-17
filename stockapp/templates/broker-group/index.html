@@ -17,9 +17,10 @@
 	<!-- Sidebar user (optional) -->
 	<div class="user-panel mt-3 pb-3 mb-3 d-flex">
 		<div class="image">
-			
+			<img src="{% static 'img/wallet.png' %}" alt="" class="brand-image" style="opacity: .8">
 		</div>
 		<div class="info">
+
 			<a class="d-block">{{ User }}</a>
 		</div>
 	</div>
@@ -28,16 +29,16 @@
 	<nav class="mt-2">
 		<ul  id="sidebar"  class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 			<li class="nav-item">
-				<a href="#new-group" class="nav-link" data-bs-toggle="modal" data-bs-target="#new-group">
+				<a href="#new-broker-group" class="nav-link" data-bs-toggle="modal" data-bs-target="#new-broker-group">
 					<i class="far fa-circle nav-icon"></i>
 					<p>新增券商群組</p>
 				</a>
 			</li>	 
-			{% for group in group_list %}
+			{% for broker_group in broker_group_list %}
 			<li class="nav-item">
-				<a href="/group/{{ group.id }}" class="nav-link">
+				<a href="/broker-group/{{ broker_group.id }}" class="nav-link">
 				<i class="far fa-circle nav-icon"></i>
-				<p>{{ group.Name }}</p>
+				<p>{{ broker_group.Name }}</p>
 				</a>
 			</li>
 			{% endfor %}
@@ -57,17 +58,17 @@
 {% block content %}
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-	{% if group %}
+	{% if broker_group %}
 	<!-- Content Header (Page header) -->
 	<div class="content-header">
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-sm-4 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-					<h1 class="m-0">{{ group.Name }}
-						<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit-group">
+					<h1 class="m-0">{{ broker_group.Name }}
+						<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit-broker-group">
 							編輯
 						</a>
-						<a href="delete" class="btn btn-outline-danger">
+						<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-broker-group">
 							刪除
 						</a>
 					</h1>
@@ -78,12 +79,12 @@
 					</a>
 				</div>
 				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
-					<form method="POST" action="" novalidate>
+					<form method="POST" action="">
 						{% csrf_token %}
 						<div class="row no-gutters">
 							<div class="col-sm-5 col-12 mr-2">
 								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
-								<input class="form-control" id="begin-date" name="begin-date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}">
+								<input class="form-control" id="begin-date" name="begin-date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" onchange="sync_end_date()">
 							</div>
 							<div class="col-sm-5 col-12 mr-2">
 								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
@@ -132,8 +133,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
+										<th colspan="2">買進</th>
+										<th colspan="2">賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -142,17 +143,27 @@
 								<tbody>
 									{% for stock in stock_list.positive %}
 									<tr>
-										<td><a href="javascript:SearchWantGoo({{ stock.id }})">{{ stock.id }}</a></td>
+										<td><a href="javascript:SearchWantGoo({{ stock.code }})">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>
-										{% for buy in stock.buy_in %}
-										{{ buy }}<br>
+										{% for buy in stock.buyin %}
+										{{ buy.name }}<br>
 										{% endfor %}
 										</td>
 										<td>
-										{% for sell in stock.sell_out %}
-										{{ sell }}<br>
+										{% for buy in stock.buyin %}
+										{{ buy.diff|intcomma }}<br>
+										{% endfor %}
+										</td>
+										<td>
+										{% for sell in stock.sellout %}
+										{{ sell.name }}<br>
+										{% endfor %}
+										</td>
+										<td>
+										{% for sell in stock.sellout %}
+										{{ sell.diff|intcomma }}<br>
 										{% endfor %}
 										</td>
 										<td>{{ stock.sumForeign }}</td>
@@ -166,8 +177,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
+										<th colspan="2">買進</th>
+										<th colspan="2">賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -192,8 +203,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
+										<th colspan="2">買進</th>
+										<th colspan="2">賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -202,17 +213,27 @@
 								<tbody>
 									{% for stock in stock_list.negative %}
 									<tr>
-										<td><a href="javascript:SearchWantGoo({{ stock.id }})">{{ stock.id }}</a></td>
+										<td><a href="javascript:SearchWantGoo({{ stock.code }})">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>
-										{% for buy in stock.buy_in %}
-										{{ buy }}<br>
+										{% for buy in stock.buyin %}
+										{{ buy.name }}<br>
 										{% endfor %}
 										</td>
 										<td>
-										{% for sell in stock.sell_out %}
-										{{ sell }}<br>
+										{% for buy in stock.buyin %}
+										{{ buy.diff|intcomma }}<br>
+										{% endfor %}
+										</td>
+										<td>
+										{% for sell in stock.sellout %}
+										{{ sell.name }}<br>
+										{% endfor %}
+										</td>
+										<td>
+										{% for sell in stock.sellout %}
+										{{ sell.diff|intcomma }}<br>
 										{% endfor %}
 										</td>
 										<td>{{ stock.sumForeign }}</td>
@@ -226,8 +247,8 @@
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
+										<th colspan="2">買進</th>
+										<th colspan="2">賣出</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
@@ -251,7 +272,7 @@
 {% endblock content %}
 
 {% block modal %}
-<div class="modal fade" id="new-group" tabindex="-1" aria-labelledby="new-group" aria-hidden="true">
+<div class="modal fade" id="new-broker-group" tabindex="-1" aria-labelledby="new-broker-group" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -259,24 +280,45 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form class="needs-validation" method="POST" action="/group/create/" novalidate>
+				<form class="needs-validation" method="POST" action="/broker-group/create/">
 				{% csrf_token %}
-					<div class="form-floating mb-3">
-						<input type="text" class="form-control" id="group-name" name="group-name" placeholder="新名稱" autocomplete="off" required>
+					<div class="mb-3">
 						<label for="group-name">群組名稱</label>
+						<input type="text" class="form-control" id="new-group-name" name="new-group-name" placeholder="新名稱" autocomplete="off" required>
 					</div>
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-outline-primary">
-							確認
-						</button>
-					</div>
+					<button type="submit" id="new-broker-group-submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('new-broker-group-submit').click()">
+					確認
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="delete-broker-group" tabindex="-1" aria-labelledby="delete-broker-group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">刪除券商群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				確認刪除 <font class="text-danger">{{ broker_group.Name }}</font> 券商群組？
+			</div>
+			<div class="modal-footer">
+				<form class="needs-validation" method="POST" action="delete">
+					{% csrf_token %}
+					<button class="btn btn-outline-danger" type="submit">刪除</button>
 				</form>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="modal fade" id="edit-group" tabindex="-1" aria-labelledby="edit-group" aria-hidden="true">
+<div class="modal fade" id="edit-broker-group" tabindex="-1" aria-labelledby="edit-broker-group" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -284,18 +326,19 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form class="needs-validation" method="POST" action="edit" novalidate>
+				<form class="needs-validation" method="POST" action="edit">
 				{% csrf_token %}
-					<div class="form-floating mb-3">
-						<input type="text" class="form-control" id="new-group-name" name="new-group-name" value="{{ group.Name }}" placeholder="新名稱" autocomplete="off" required>
-						<label for="new-group-name">新名稱</label>
+					<div class="mb-3">
+						<label for="edit-group-name">新名稱</label>
+						<input type="text" class="form-control" id="edit-group-name" name="edit-group-name" value="{{ broker_group.Name }}" placeholder="新名稱" autocomplete="off" required>
 					</div>
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-outline-primary">
-							確認
-						</button>
-					</div>
+					<button type="submit" id="edit-broker-group-submit" hidden>Continue to checkout</button>
 				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-outline-primary" onclick="document.getElementById('edit-broker-group-submit').click()">
+					確認
+				</button>
 			</div>
 		</div>
 	</div>
@@ -305,23 +348,26 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">上傳券商</h5>
+				<h5 class="modal-title">上傳券商清單</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form enctype="multipart/form-data"  class="needs-validation" method="POST" action="upload" novalidate>
+				<p>Csv 格式:</p>
+				<p>代號 | 名稱 | 交易次數 | 平均最大報酬率 | 勝率 | 交易檔數</p>
+				<p>p.s. 自動將舊的券商全都刪除 & 奔改為(牛牛牛)</p>
+				<form enctype="multipart/form-data"  class="needs-validation" method="POST" action="upload">
 				{% csrf_token %}
 					<div class="form-floating mb-3">
 						<div class="mb-3">
 							<label for="upload" class="form-label" >上傳檔案</label>
-							<input class="form-control" type="file" accept=".csv" id="uploadfile" name="uploadfile">
-						  </div>
+							<input class="form-control" type="file" accept=".csv" id="uploadfile" name="uploadfile" required>
+						</div>
 					</div>
-					<button type="submit" id="upload_submit" hidden>Continue to checkout</button>
+					<button type="submit" id="upload-submit" hidden>Continue to checkout</button>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('upload_submit').click()">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('upload-submit').click()">
 					上傳
 				</button>
 			</div>
@@ -372,6 +418,10 @@
 
 {% block script %}
 <script>
+	function sync_end_date(){
+		document.getElementById("end-date").value = document.getElementById("begin-date").value;
+	}
+	
 	$('#sidebar').find('a').each(function () {
 		if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
 			$(this).addClass('active');
@@ -470,7 +520,7 @@
 					extend: 'csv',
 					text: '下載CSV',
 					bom : true,
-					title: '{{ group.Name }} 買入' + ' ' + begin_date + ' ' + end_date
+					title: '{{ broker_group.Name }} 買入' + ' ' + begin_date + ' ' + end_date
 				},
 				{
 					extend: 'colvis',
@@ -512,7 +562,7 @@
 					extend: 'csv',
 					text: '下載CSV',
 					bom : true,
-					title: '{{ group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
+					title: '{{ broker_group.Name }} 賣出' + ' ' + begin_date + ' ' + end_date
 				},
 				{
 					extend: 'colvis',

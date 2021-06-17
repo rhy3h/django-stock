@@ -82,7 +82,7 @@
 						</button>
 					</h6>
 					<ul class="nav flex-column">
-						{% for group in group_list %}
+						{% for group in broker_group_list %}
 							<li class="nav-item">
 								{% if group.id == group_id %}
 									<a class="nav-link active" aria-current="page" href="/group/{{ group.id }}">

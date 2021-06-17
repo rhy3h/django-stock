@@ -8,7 +8,9 @@ class Stock:
         self.name = name
         self.diff = diff
         self.days = 1
+        self.date = []
 
+import csv
 @login_required
 def index(request):
     User = request.user
@@ -17,38 +19,41 @@ def index(request):
     leader_sellout_list = []
 
     for file in request.FILES.getlist('uploadfiles'):
-        for line in file:
-            string = line.decode("utf-8-sig").replace('\"', '').replace('\t', '').replace('\r\n', '').split(',')
-            if string[0] != '股票代碼':
-                code = string[0]
-                name = string[1]
-                diff = ""
-                for item in string[2:-5]:
-                    diff += item.replace(' ', '')
-                stock = Stock(code, name, int(diff))
+        file_date = file.name.split(' ')[-1][:-4]
 
-                if stock.diff > 0:
-                    flag_index = -1
-                    for item in leader_buyin_list:
-                        if item.code == stock.code:
-                            flag_index = int(leader_buyin_list.index(item))
-                            break
+        decoded_file = file.read().decode('utf-8-sig').replace('\t', '').splitlines()
+        csv_data = csv.DictReader(decoded_file)
+        
+        for data in csv_data:
+            code = data['股票代碼']
+            name = data['名稱']
+            diff = int(data['差額(仟元)'].replace(',', ''))
+            stock = Stock(code, name, diff)
+            stock.date.append(file_date)
 
-                    if flag_index > -1:
-                        leader_buyin_list[flag_index].diff += stock.diff
-                        leader_buyin_list[flag_index].days += 1
-                    else:
-                        leader_buyin_list.append(stock)
+            if stock.diff > 0:
+                flag_index = -1
+                for item in leader_buyin_list:
+                    if item.code == stock.code:
+                        flag_index = int(leader_buyin_list.index(item))
+                        break
+                if flag_index > -1:
+                    leader_buyin_list[flag_index].diff += stock.diff
+                    leader_buyin_list[flag_index].days += 1
+                    leader_buyin_list[flag_index].date.append(file_date)
                 else:
-                    flag_index = -1
-                    for item in leader_sellout_list:
-                        if item.code == stock.code:
-                            flag_index = int(leader_sellout_list.index(item))
-                    
-                    if flag_index > -1:
-                        leader_sellout_list[flag_index].diff += stock.diff
-                        leader_sellout_list[flag_index].days += 1
-                    else:
-                        leader_sellout_list.append(stock)
+                    leader_buyin_list.append(stock)
+            else:
+                flag_index = -1
+                for item in leader_sellout_list:
+                    if item.code == stock.code:
+                        flag_index = int(leader_sellout_list.index(item))
+                
+                if flag_index > -1:
+                    leader_sellout_list[flag_index].diff += stock.diff
+                    leader_sellout_list[flag_index].days += 1
+                    leader_sellout_list[flag_index].date.append(file_date)
+                else:
+                    leader_sellout_list.append(stock)
 
     return render(request, 'leaderboard/index.html', locals())

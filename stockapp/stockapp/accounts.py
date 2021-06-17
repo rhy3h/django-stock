@@ -32,7 +32,7 @@ def sign_up(request):
             raw_password = form.cleaned_data.get('password1')
             user = auth.authenticate(username=username, password=raw_password)
             auth.login(request, user)
-            return redirect('/group')
+            return redirect('/broker-group')
     else:
         form = RegisterForm()
     
@@ -57,7 +57,7 @@ def sign_in(request):
             
             if user is not None:
                 auth.login(request, user)
-                return redirect('/group')
+                return redirect('/broker-group')
     else:
         form = LoginForm()
     

@@ -6,7 +6,7 @@ from django.utils.encoding import escape_uri_path
 
 from datetime import date, datetime, timedelta
 
-from ..models import Group, Broker
+from ..models import *
 from ..fubon.fubon import fubon_get_list, get_id_name, get_branch
 from ..wantgoo.institutional_investors import institutional_investors_data, stock_append_data
 
@@ -18,14 +18,14 @@ def progress_bar(count, length):
 @login_required
 def base(request):
     User = request.user
-    group_list = Group.objects.filter(Owner=User)
-    title = '群組'
+    broker_group_list = BrokerGroup.objects.filter(
+        Owner = User
+    )
     
-    with open('stockapp/static/js/stock.csv', newline='', encoding='utf-8-sig') as f:
-        reader = csv.reader(f)
-        stocks = list(reader)
-    
-    return render(request, 'group/index.html', locals())
+    try:
+        return redirect('/broker-group/' + str(broker_group_list.first().id))
+    except:
+        return render(request, 'broker-group/index.html', locals())
     
 def read_csv(file):
     data = []
@@ -77,16 +77,22 @@ def sync(request, group_id):
 @login_required
 def index(request, group_id):
     User = request.user
-    group_list = Group.objects.filter(Owner=User)
-    group = group_list.get(id = group_id)
-    title = '群組 ' + group.Name
-    broker_list = Broker.objects.filter(Group = group)
+    broker_group_list = BrokerGroup.objects.filter(
+        Owner = User
+    )
+    broker_group = broker_group_list.get(
+        id = group_id
+    )
+    title = '群組 ' + broker_group.Name
+    broker_list = Broker.objects.filter(
+        BrokerGroup = broker_group
+    )
     today = date.today().strftime("%Y-%m-%d")
     begin_date = today
     end_date = today
 
     if request.POST.get('search'):
-        if request.POST.get('end_date') != '':
+        if request.POST.get('end-date') != '':
             begin_date = request.POST.get('begin-date')
             begin_datatime = datetime.strptime(begin_date, "%Y-%m-%d")
             end_date = request.POST.get('end-date')
@@ -110,68 +116,79 @@ def index(request, group_id):
             item = stock_append_data(item, end_date)
         for item in stock_list['negative']:
             item = stock_append_data(item, end_date)
-    with open('stockapp/static/js/stock.csv', newline='', encoding='utf-8-sig') as f:
-        reader = csv.reader(f)
-        stocks = list(reader)
 
-    return render(request, 'group/index.html', locals())
+    return render(request, 'broker-group/index.html', locals())
 
 @login_required
 def create(request):
     if request.method == "POST":
-        group_name = request.POST['group-name']
+        new_group_name = request.POST['new-group-name']
         User = request.user
-        Group.objects.get_or_create(Owner = User,
-                                Name = group_name)
-        group = Group.objects.filter(Owner=User).last()
+        BrokerGroup.objects.get_or_create(
+            Owner = User,
+            Name = new_group_name
+        )
+        broker_group = BrokerGroup.objects.filter(
+            Owner=User
+        ).last()
 
-        return redirect('/group/' + str(group.id))
+        return redirect('/broker-group/' + str(broker_group.id))
 
 @login_required
 def edit(request, group_id):
     if request.method == "POST":
-        new_group_name = request.POST['new-group-name']
         User = request.user
-        group = Group.objects.get(Owner = User,
-                            id = group_id)
-        group.Name = new_group_name
-        group.save()
+        edit_group_name = request.POST['edit-group-name']
+        broker_group = BrokerGroup.objects.get(
+            Owner = User,
+            id = group_id
+        )
+        broker_group.Name = edit_group_name
+        broker_group.save()
     
-    return redirect('/group/' + str(group_id))
+    return redirect('/broker-group/' + str(group_id))
 
 @login_required
 def delete(request, group_id):
-    User = request.user
-    group = Group.objects.get(Owner = User,
-                        id = group_id)
-    group.delete()
+    if request.method == "POST":
+        User = request.user
+        broker_group = BrokerGroup.objects.get(
+            Owner = User,
+            id = group_id
+        )
+        broker_group.delete()
 
-    return redirect('/group/')
+    return redirect('/broker-group/')
 
 @login_required
 def upload(request, group_id):
     User = request.user
-    group = Group.objects.filter(Owner = User).get(id = group_id)
-    broker_list = Broker.objects.filter(Group = group)
+    broker_group = BrokerGroup.objects.filter(
+        Owner = User
+    ).get(
+        id = group_id
+    )
+    broker_list = Broker.objects.filter(
+        BrokerGroup = broker_group
+    )
     
     if request.method == "POST":
         for broker in broker_list:
             broker.delete()
 
         uploadfile = request.FILES['uploadfile']
-        branch_names = []
-        for line in uploadfile:
-            string = line.decode("utf-8-sig")
-            string_data = string.split(',')[1]
-            branch_names.append(string_data)
-        
-        for name in branch_names[1:]:
+        decoded_file = uploadfile.read().decode('utf-8-sig').splitlines()
+        csv_data = csv.DictReader(decoded_file)
+        for item in csv_data:
+            name = item['名稱']
             if name[0] == '奔':
                 name = '(牛牛牛)' + name[1:]
             broker_branch = get_branch(name)
-            Broker.objects.get_or_create(Group = group,
-                                Name = name,
-                                Broker = broker_branch[0],
-                                Branch = broker_branch[1])
+            Broker.objects.get_or_create(
+                BrokerGroup = broker_group,
+                Name = name,
+                Broker = broker_branch[0],
+                Branch = broker_branch[1]
+            )
     
-    return redirect('/group/' + str(group_id))
+    return redirect('/broker-group/' + str(group_id))
