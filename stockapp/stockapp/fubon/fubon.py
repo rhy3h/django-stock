@@ -115,6 +115,13 @@ def merge_list(stock_list):
             diff = stock_list['negative'][i]['差額']
             temp = Stock(stock_code, stock_name, diff)
             temp.sellout.append(stock_list['negative'][i]['券商分部'])
+            for j in range(i + 1, len(stock_list['negative'])):
+                if stock_list['negative'][j] != None:
+                    if stock_list['negative'][i]['股票代碼'] == stock_list['negative'][j]['股票代碼']:
+                        temp.diff += stock_list['negative'][j]['差額']
+                        temp.sellout.append(stock_list['negative'][j]['券商分部'])
+                        stock_list['negative'][j] = None
+            
             data['negative'].append(temp)
             stock_list['negative'][i] = None
     
