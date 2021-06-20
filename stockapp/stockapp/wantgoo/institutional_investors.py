@@ -99,16 +99,27 @@ def continuous(stock_data):
     
     return data
 
+from ..load_csv import *
+
 def stock_append_data(item, end_date):
-    stock_id = item.code
-    if len(stock_id) == 5:
+    stock_code = item.code
+    
+    if len(stock_code) == 5:
         return item
     try:
-        stock_data = read_csv('stockapp/csv/' + stock_id + '.csv', end_date)
+        dict_stock_list = load_dict_stock_list()
+
+        stock_data = read_csv('stockapp/csv/' + stock_code + '.csv', end_date)
         count = continuous(stock_data[1:])
         item.sumForeign = count['sumForeign']
         item.sumING = count['sumING']
         item.sumDealer = count['sumDealer']
+        for stock in dict_stock_list:
+            if stock_code == stock['代碼']:
+                item.capital = stock['股本']
+                item.industry = stock['產業']
+                item.status = stock['產業地位']
+                break
     except:
         pass
     

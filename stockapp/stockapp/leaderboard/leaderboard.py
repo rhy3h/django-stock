@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ..wantgoo.institutional_investors import institutional_investors_data, stock_append_data
 
-import csv
+from ..load_csv import *
 
 class Stock:
     def __init__(self, code, name, diff):
@@ -14,6 +14,9 @@ class Stock:
         self.sumForeign = None
         self.sumING = None
         self.sumDealer = None
+        self.capital = None
+        self.industry = None
+        self.status = None
 
 @login_required
 def index(request):
@@ -91,4 +94,22 @@ def index(request):
         stock_append_data(leader_sellout_list[i], leader_sellout_list[i].date[0])
         i += 1
     
-    return render(request, 'leaderboard/index.html', locals())
+    dict_stock_list = load_dict_stock_list()
+
+    for buyin in leader_buyin_list:
+        for stock in dict_stock_list:
+            if buyin.code == stock['代碼']:
+                buyin.capital = stock['股本']
+                buyin.industry = stock['產業']
+                buyin.status = stock['產業地位']
+                break
+    
+    for sellout in leader_sellout_list:
+        for stock in dict_stock_list:
+            if sellout.code == stock['代碼']:
+                sellout.capital = stock['股本']
+                sellout.industry = stock['產業']
+                sellout.status = stock['產業地位']
+                break
+
+    return render(request, 'leaderboard.html', locals())

@@ -25,7 +25,7 @@ def base(request):
     try:
         return redirect('/broker-group/' + str(broker_group_list.first().id))
     except:
-        return render(request, 'broker-group/index.html', locals())
+        return render(request, 'broker-group.html', locals())
     
 def read_csv(file):
     data = []
@@ -117,7 +117,7 @@ def index(request, group_id):
         for item in stock_list['negative']:
             item = stock_append_data(item, end_date)
 
-    return render(request, 'broker-group/index.html', locals())
+    return render(request, 'broker-group.html', locals())
 
 @login_required
 def create(request):

@@ -5,15 +5,9 @@ from django.contrib.auth.decorators import login_required
 
 from ..models import *
 
-import csv
+from ..load_csv import *
 
 from ..wantgoo.apis import api
-
-def load_default_stock_list():
-    with open('stockapp/files/stock_list.csv', newline='', encoding='utf-8-sig') as f:
-        reader = csv.reader(f)
-        stocks = list(reader)
-    return stocks
 
 @login_required
 def base(request):
@@ -22,21 +16,21 @@ def base(request):
     try:
         return redirect('/stock-group/' + str(stock_group_list.first().id))
     except:
-        return render(request, 'stock-group/index.html', locals())
+        return render(request, 'stock-group.html', locals())
 
 @login_required
 def index(request, group_id):
     User = request.user
     stock_group_list = StockGroup.objects.filter(Owner=User)
     broker_group_list = BrokerGroup.objects.filter(Owner=User)
-
+    
     stock_group = stock_group_list.get(id = group_id)
     title = '股票群組'
-    default_stock_list = load_default_stock_list()
+    default_stock_list = load_list_stock_list()
     stock_list = Stock.objects.filter(
         StockGroup = stock_group
     )
-    return render(request, 'stock-group/index.html', locals())
+    return render(request, 'stock-group.html', locals())
 
 @login_required
 def create(request):
