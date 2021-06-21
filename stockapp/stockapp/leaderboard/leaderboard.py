@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from ..wantgoo.institutional_investors import institutional_investors_data, stock_append_data
+from ..wantgoo.institutional_investors import *
 
 from ..load_csv import *
 
@@ -17,15 +17,20 @@ class Stock:
         self.capital = None
         self.industry = None
         self.status = None
+    
+    def __lt__(self, other):
+        return self.code < other.code
 
 @login_required
 def index(request):
     User = request.user
     title = "排行榜"
+    leader_list = []
     leader_buyin_list = []
     leader_sellout_list = []
     buyin_date = []
     sellout_date = []
+    
     for file in request.FILES.getlist('uploadfiles'):
         file_date = file.name.split(' ')[-1][:-4]
         if file.name.split(' ')[1] == '買入':
@@ -41,75 +46,51 @@ def index(request):
             diff = int(data['差額(仟元)'].replace(',', ''))
             stock = Stock(code, name, diff)
             stock.date.append(file_date)
-
-            if stock.diff > 0:
-                flag_index = -1
-                for item in leader_buyin_list:
-                    if item.code == stock.code:
-                        flag_index = int(leader_buyin_list.index(item))
-                        break
-                if flag_index > -1:
-                    leader_buyin_list[flag_index].diff += stock.diff
-                    leader_buyin_list[flag_index].date.append(file_date)
-                else:
-                    leader_buyin_list.append(stock)
-            else:
-                flag_index = -1
-                for item in leader_sellout_list:
-                    if item.code == stock.code:
-                        flag_index = int(leader_sellout_list.index(item))
-                
-                if flag_index > -1:
-                    leader_sellout_list[flag_index].diff += stock.diff
-                    leader_sellout_list[flag_index].date.append(file_date)
-                else:
-                    leader_sellout_list.append(stock)
+            leader_list.append(stock)
     
-    buyin_date.reverse()
-    sellout_date.reverse()
-    
-    i = 0
-    while i < len(leader_buyin_list):
-        leader_buyin_list[i].date.reverse()
-        day = 0
-        while day < len(leader_buyin_list[i].date) and leader_buyin_list[i].date[day] == buyin_date[day]:
-            day += 1
-        leader_buyin_list[i].days = day
-        if day == 0:
-            leader_buyin_list.remove(leader_buyin_list[i])
-            i -= 1
-        stock_append_data(leader_buyin_list[i], leader_buyin_list[i].date[0])
-        i += 1
-    
-    i = 0
-    while i < len(leader_sellout_list):
-        leader_sellout_list[i].date.reverse()
-        day = 0
-        while day < len(leader_sellout_list[i].date) and leader_sellout_list[i].date[day] == sellout_date[day]:
-            day += 1
-        leader_sellout_list[i].days = day
-        if day == 0:
-            leader_sellout_list.remove(leader_sellout_list[i])
-            i -= 1
-        stock_append_data(leader_sellout_list[i], leader_sellout_list[i].date[0])
-        i += 1
+    buyin_date.sort(reverse=True)
+    sellout_date.sort(reverse=True)
+    leader_list.sort()
     
     dict_stock_list = load_dict_stock_list()
-
-    for buyin in leader_buyin_list:
-        for stock in dict_stock_list:
-            if buyin.code == stock['代碼']:
-                buyin.capital = stock['股本']
-                buyin.industry = stock['產業']
-                buyin.status = stock['產業地位']
-                break
     
-    for sellout in leader_sellout_list:
-        for stock in dict_stock_list:
-            if sellout.code == stock['代碼']:
-                sellout.capital = stock['股本']
-                sellout.industry = stock['產業']
-                sellout.status = stock['產業地位']
-                break
+    i = 0
+    while i < len(leader_list):
+        stock = Stock(leader_list[i].code, leader_list[i].name, leader_list[i].diff)
+        stock.date.append(leader_list[i].date[0])
+        j = i + 1
+        while j < len(leader_list) and leader_list[i].code == leader_list[j].code:
+            stock.diff += leader_list[j].diff
+            stock.date.append(leader_list[j].date[0])
+            j += 1
+        
+        stock.date.sort(reverse=True)
 
+        if len(stock.code) == 4:
+            stock_data = read_csv('stockapp/csv/' + stock.code + '.csv', stock.date[0])
+            count = continuous(stock_data[1:])
+            stock.sumForeign = count['sumForeign']
+            stock.sumING = count['sumING']
+            stock.sumDealer = count['sumDealer']
+            for dict_stock in dict_stock_list:
+                if stock.code == dict_stock['代碼']:
+                    stock.capital = dict_stock['股本']
+                    stock.industry = dict_stock['產業']
+                    stock.status = dict_stock['產業地位']
+                    break
+        
+        if stock.diff > 0:
+            day = 0
+            while day < len(stock.date) and stock.date[day] == buyin_date[day]:
+                day += 1
+            stock.days = day
+            leader_buyin_list.append(stock)
+        else:
+            day = 0
+            while day < len(stock.date) and stock.date[day] == sellout_date[day]:
+                day += 1
+            stock.days = day
+            leader_sellout_list.append(stock)
+        i = j
+    
     return render(request, 'leaderboard.html', locals())
