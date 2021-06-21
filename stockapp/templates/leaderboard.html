@@ -82,7 +82,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									{% for stock in leader_buyin_list %}
+									{% for stock in buyin_list %}
 									<tr>
 										<td><a href="javascript:SearchWantGoo({{ stock.code }}, '{{ buyin_date.0 }}')">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
@@ -142,7 +142,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									{% for stock in leader_sellout_list %}
+									{% for stock in sellout_list %}
 									<tr>
 										<td><a href="javascript:SearchWantGoo({{ stock.code }}, '{{ sellout_date.0 }}')">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
