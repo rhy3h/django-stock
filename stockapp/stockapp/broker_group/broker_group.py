@@ -160,6 +160,8 @@ def delete(request, group_id):
 
     return redirect('/broker-group/')
 
+import openpyxl
+
 @login_required
 def upload(request, group_id):
     User = request.user
@@ -177,16 +179,20 @@ def upload(request, group_id):
             broker.delete()
 
         uploadfile = request.FILES['uploadfile']
-        decoded_file = uploadfile.read().decode('utf-8-sig').splitlines()
-        csv_data = csv.DictReader(decoded_file)
-        for item in csv_data:
-            name = item['名稱']
-            if name[0] == '奔':
-                name = '(牛牛牛)' + name[1:]
-            broker_branch = get_branch(name)
+        wb = openpyxl.load_workbook(uploadfile)
+        sheet = wb.worksheets[0]
+        data = []
+        
+        for item in sheet['B'][1:]:
+            data.append(item.value)
+
+        for item in data:
+            if item[0] == '奔':
+                item = '(牛牛牛)' + item[1:]
+            broker_branch = get_branch(item)
             Broker.objects.get_or_create(
                 BrokerGroup = broker_group,
-                Name = name,
+                Name = item,
                 Broker = broker_branch[0],
                 Branch = broker_branch[1]
             )

@@ -18,6 +18,8 @@ def base(request):
     except:
         return render(request, 'stock-group.html', locals())
 
+
+
 @login_required
 def index(request, group_id):
     User = request.user
