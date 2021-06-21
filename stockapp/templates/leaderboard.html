@@ -131,7 +131,7 @@
 										<th>代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>主力買超</th>
+										<th>主力賣超</th>
 										<th>出現天數</th>
 										<th>外資</th>
 										<th>投信</th>
@@ -163,7 +163,7 @@
 										<th>代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>主力買超</th>
+										<th>主力賣超</th>
 										<th>出現天數</th>
 										<th>外資</th>
 										<th>投信</th>
@@ -329,7 +329,8 @@
 						id: 'download-buyin-leaderboard-button'
 					},
 					bom : true,
-					title: '{{ buyin_date.0 }} 買入排行榜'
+					filename: '{{ buyin_date.0 }} 買入排行榜',
+					title: ''
 				},
 				{
 					extend: 'colvis',
@@ -376,7 +377,8 @@
 						id: 'download-sellout-leaderboard-button'
 					},
 					bom : true,
-					title: '{{ sellout_date.0 }} 賣出排行榜'
+					filename: '{{ sellout_date.0 }} 賣出排行榜',
+					title: ''
 				},
 				{
 					extend: 'colvis',
