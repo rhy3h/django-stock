@@ -1,3 +1,3 @@
 call conda activate stock
-python stockapp/manage.py makemigrations stockapp
-python stockapp/manage.py migrate
+python djangoapp/manage.py makemigrations djangoapp
+python djangoapp/manage.py migrate

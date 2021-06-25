@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath stockapp stockapp.wsgi
+web: gunicorn --pythonpath djangoapp djangoapp.wsgi

@@ -1,0 +1,590 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block mystyle %}
+<style>
+</style>
+{% endblock mystyle %}
+
+{% block sidebar %}
+<!-- Sidebar -->
+<div class="sidebar">
+	<!-- Sidebar user (optional) -->
+	<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+		<div class="image">
+			<img src="{% static 'img/wallet.png' %}" alt="" class="brand-image" style="opacity: .8">
+		</div>
+		<div class="info">
+
+			<a class="d-block">{{ User }}</a>
+		</div>
+	</div>
+
+	<!-- Sidebar Menu -->
+	<nav class="mt-2">
+		<ul  id="sidebar"  class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+			<li class="nav-item">
+				<a href="#new-broker-group" class="nav-link" data-bs-toggle="modal" data-bs-target="#new-broker-group">
+					<i class="far fa-circle nav-icon"></i>
+					<p>新增券商群組</p>
+				</a>
+			</li>	 
+			{% for broker_group in broker_group_list %}
+			<li class="nav-item">
+				<a href="/broker-group/{{ broker_group.id }}" class="nav-link">
+				<i class="far fa-circle nav-icon"></i>
+				<p>{{ broker_group.Name }}</p>
+				</a>
+			</li>
+			{% endfor %}
+		</ul>
+	</nav>
+	<!-- /.sidebar-menu -->
+</div>
+<!-- /.sidebar -->
+
+<div class="sidebar-custom">
+	<a href="#positive"class="btn btn-secondary hide-on-collapse">買入</a>
+	<a href="#negative" class="btn btn-secondary hide-on-collapse pos-right">賣出</a>
+</div>
+<!-- /.sidebar-custom -->
+{% endblock sidebar %}
+
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	{% if broker_group %}
+	<!-- Content Header (Page header) -->
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-4 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+					<h1 class="m-0">{{ broker_group.Name }}
+						<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit-broker-group">
+							編輯
+						</a>
+						<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-broker-group">
+							刪除
+						</a>
+					</h1>
+				</div><!-- /.col -->
+				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
+					<h1 class="m-0">
+						<button type="button" class="btn btn-outline-primary" onclick="download()">
+							下載
+						</button>
+						<a href="javascript:Crawler_GoodInfo()" class="btn btn-outline-warning">
+							同步
+						</a>
+					</h1>
+				</div>
+				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
+					<form method="POST" action="">
+						{% csrf_token %}
+						<div class="row no-gutters">
+							<div class="col-sm-5 col-12 mr-2">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
+								<input class="form-control" id="begin-date" name="begin-date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" onchange="sync_end_date()">
+							</div>
+							<div class="col-sm-5 col-12 mr-2">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
+								<input class="form-control" id="end-date" name="end-date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
+							</div>
+							<div class="col-sm-1 col-12 mr-2">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
+								<input class="btn btn-outline-primary" type="submit" value="搜尋" name="search">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div><!-- /.row -->
+			
+			<h3 class="h3 pt-3">券商清單
+				<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#upload">
+					上傳
+				</a>
+			</h3>
+			<div id="broker_list" class="row pt-3 border-bottom">
+				{% for broker in broker_list %}
+				<h6 class="fs-4 col-xxl-2 col-xl-3 col-lg-4 col-sm-6 d-flex justify-content-between align-items-center">
+					<span class="fs-5">{{ broker.Name }}</span>
+				</h6>
+				{% endfor %}
+			</div>
+		</div><!-- /.container-fluid -->
+	</div>
+	<!-- /.content-header -->
+
+	<div class="content">
+		<div class="container-fluid">
+			<div class="row pt-3 ">
+				<div class="col-lg-12" id="positive">
+					<div class="card">
+						<div class="card-header text-primary">
+							買入
+						</div>
+						<div class="card-body">
+							<table class="table table-bordered table-striped" id="positive-table" style="width:100%">
+								<thead>
+									<tr>
+										<th>股票代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>買進</th>
+										<th>賣出</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
+										<th>股本</th>
+										<th>產業</th>
+										<th>產業地位</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for stock in stock_table.positive %}
+									<tr>
+										<td><a href="javascript:SearchWantGoo('{{ stock.code }}', '{{ stock.name }}')">{{ stock.code }}</a></td>
+										<td>{{ stock.name }}</td>
+										<td>{{ stock.diff|intcomma }}</td>
+										<td>
+										{% for buy in stock.buyin %}
+										<p>{{ buy.name }}: {{ buy.diff|intcomma }}</p>
+										{% endfor %}
+										</td>
+										<td>
+										{% for sell in stock.sellout %}
+										<p>{{ sell.name }}: {{ sell.diff|intcomma }}</p>
+										{% endfor %}
+										</td>
+										<td>{{ stock.sumForeign }}</td>
+										<td>{{ stock.sumING }}</td>
+										<td>{{ stock.sumDealer }}</td>
+										<td>{{ stock.capital }}</td>
+										<td>{{ stock.industry }}</td>
+										<td>{{ stock.status }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+								<tfoot>
+									<tr>
+										<th>股票代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>買進</th>
+										<th>賣出</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
+										<th>股本</th>
+										<th>產業</th>
+										<th>產業地位</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>		
+					<!-- /.card -->
+				</div>
+				<!-- /.col-md-6 -->
+
+				<div class="col-lg-12" id="negative">
+					<div class="card">
+						<div class="card-header text-primary">
+							賣出
+						</div>
+						<div class="card-body">
+							<table class="table table-bordered table-striped" id="negative-table" style="width:100%">
+								<thead>
+									<tr>
+										<th>股票代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>買進</th>
+										<th>賣出</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
+										<th>股本</th>
+										<th>產業</th>
+										<th>產業地位</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for stock in stock_table.negative %}
+									<tr>
+										<td><a href="javascript:SearchWantGoo('{{ stock.code }}', '{{ stock.name }}')">{{ stock.code }}</a></td>
+										<td>{{ stock.name }}</td>
+										<td>{{ stock.diff|intcomma }}</td>
+										<td>
+										{% for buy in stock.buyin %}
+										<p>{{ buy.name }}: {{ buy.diff|intcomma }}</p>
+										{% endfor %}
+										</td>
+										<td>
+										{% for sell in stock.sellout %}
+										<p>{{ sell.name }}: {{ sell.diff|intcomma }}</p>
+										{% endfor %}
+										</td>
+										<td>{{ stock.sumForeign }}</td>
+										<td>{{ stock.sumING }}</td>
+										<td>{{ stock.sumDealer }}</td>
+										<td>{{ stock.capital }}</td>
+										<td>{{ stock.industry }}</td>
+										<td>{{ stock.status }}</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+								<tfoot>
+									<tr>
+										<th>股票代碼</th>
+										<th>名稱</th>
+										<th>差額(仟元)</th>
+										<th>買進</th>
+										<th>賣出</th>
+										<th>外資</th>
+										<th>投信</th>
+										<th>自營商</th>
+										<th>股本</th>
+										<th>產業</th>
+										<th>產業地位</th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+					<!-- /.card -->
+				</div>
+				<!-- /.col-md-6 -->
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+	{% endif %}
+</div>
+<!-- /.content-wrapper -->
+
+{% endblock content %}
+
+{% block modal %}
+<div class="modal fade" id="new-broker-group" tabindex="-1" aria-labelledby="new-broker-group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增券商群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="/broker-group/create/">
+				{% csrf_token %}
+					<div class="mb-3">
+						<label for="group-name">群組名稱</label>
+						<input type="text" class="form-control" id="new-group-name" name="new-group-name" placeholder="新名稱" autocomplete="off" required>
+					</div>
+					<button type="submit" id="new-broker-group-submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('new-broker-group-submit').click()">
+					確認
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="delete-broker-group" tabindex="-1" aria-labelledby="delete-broker-group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">刪除券商群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				確認刪除 <font class="text-danger">{{ broker_group.Name }}</font> 券商群組？
+			</div>
+			<div class="modal-footer">
+				<form class="needs-validation" method="POST" action="delete">
+					{% csrf_token %}
+					<button class="btn btn-outline-danger" type="submit">刪除</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="edit-broker-group" tabindex="-1" aria-labelledby="edit-broker-group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">編輯群組</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="needs-validation" method="POST" action="edit">
+				{% csrf_token %}
+					<div class="mb-3">
+						<label for="edit-group-name">新名稱</label>
+						<input type="text" class="form-control" id="edit-group-name" name="edit-group-name" value="{{ broker_group.Name }}" placeholder="新名稱" autocomplete="off" required>
+					</div>
+					<button type="submit" id="edit-broker-group-submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-outline-primary" onclick="document.getElementById('edit-broker-group-submit').click()">
+					確認
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="upload" tabindex="-1" aria-labelledby="upload" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">上傳券商清單</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Excel 格式:</p>
+				<p>代號 | 名稱 | 交易次數 | 平均最大報酬率 | 勝率 | 交易檔數</p>
+				<p>p.s. 自動將舊的券商全都刪除 & 奔改為(牛牛牛)</p>
+				<form enctype="multipart/form-data"  class="needs-validation" method="POST" action="upload">
+				{% csrf_token %}
+					<div class="form-floating mb-3">
+						<div class="mb-3">
+							<label for="upload" class="form-label" >上傳檔案</label>
+							<input class="form-control" type="file" accept=".xlsx" id="uploadfile" name="uploadfile" required>
+						</div>
+					</div>
+					<button type="submit" id="upload-submit" hidden>Continue to checkout</button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('upload-submit').click()">
+					上傳
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="SearchWantGoo" tabindex="-1" aria-labelledby="SearchWantGoo" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="GoodInfoText">玩股網</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<table id="GoodInfoTable" class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>日期</th>
+							<th>外資</th>
+							<th>投信</th>
+							<th>自營商</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="crawler-modal" tabindex="-1" aria-labelledby="crawler-modal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header h1 d-flex justify-content-center">
+				爬蟲進行中
+			</div>
+			<div class="modal-body h5 d-flex justify-content-center">
+				<div class="spinner-border" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock modal %}
+
+{% block script %}
+<script src="{% static 'js/datatable-custom.js' %}"></script>
+<script>
+	function sync_end_date(){
+		document.getElementById("end-date").value = document.getElementById("begin-date").value;
+	}
+	
+	$('#sidebar').find('a').each(function () {
+		if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
+			$(this).addClass('active');
+		}
+	});
+
+	function SearchWantGoo(code, name){
+		let end_date = $("#end-date").val();
+		$("#GoodInfoText").text(code + ' ' + name);
+		$("#GoodInfoTable tbody").empty();
+		Promise.all([
+			$.ajax({
+				url: '/crawler/count/institutional_investors/' + code + '/' + end_date,
+				data: {
+				},
+				dataType: 'json',
+				success: function (data) {
+					text =
+						"<tr>" + 
+							"<td>" + "天數" + "</td>" + 
+							"<td>" + data[0]['sumForeign'] + "</td>" + 
+							"<td>" + data[0]['sumING'] + "</td>" + 
+							"<td>" + data[0]['sumDealer'] + "</td>" + 
+						"</tr>";
+					$("#GoodInfoTable tbody").prepend(text);
+				}
+			}),
+			$.ajax({
+				url: '/crawler/institutional_investors/' + code + '/' + end_date,
+				data: {
+				},
+				dataType: 'json',
+				success: function (data) {
+					let nf = new Intl.NumberFormat();
+
+					for(let i = 0; i < data.length; i++){
+						text =
+							"<tr>" + 
+								"<td>" + data[i]['date'] + "</td>" + 
+								"<td>" + nf.format(data[i]['sumForeign']) + "</td>" + 
+								"<td>" + nf.format(data[i]['sumING']) + "</td>" + 
+								"<td>" + nf.format(data[i]['sumDealer']) + "</td>" + 
+							"</tr>";
+						
+						$("#GoodInfoTable tbody").append(
+							text
+						);
+					}
+				}
+			}),
+		])
+		.then(([res1, res2]) => { 
+			$("#GoodInfoTable td").each(function () 
+			{
+				if( Number($(this).text().replace(/,/g, '')) > 0){
+					$(this).css("color", "red");
+				}
+				else if(Number($(this).text().replace(/,/g, '')) < 0){
+					$(this).css("color", "green");
+				}
+			});
+			$('#SearchWantGoo').modal('show');
+		})
+		.catch(error => { 
+		}); 
+	}
+	
+	function Crawler_GoodInfo(){
+		$("#crawler-modal").modal('show');
+
+		$.ajax({
+			url: 'sync/',
+			data: {
+			},
+			dataType: 'json',
+			success: function (data) {
+				$("#crawler-modal .modal-header").text("爬蟲完畢");
+				$("#crawler-modal .modal-body").empty();
+				$("#crawler-modal .modal-body").text("三秒後重整");
+				setTimeout(function(){ location.reload() }, 3000);
+			}
+		});
+	}
+
+	function download(){
+		$("#download-button").click();
+	}
+	
+	$(document).ready( function () {
+		begin_date = document.getElementById("begin-date").value;
+		end_date = document.getElementById("end-date").value;
+		
+		$("#positive-table").DataTable({
+			"language": {
+				"processing": "處理中...",
+				"loadingRecords": "載入中...",
+				"lengthMenu": "顯示 _MENU_ 項結果",
+				"zeroRecords": "沒有符合的結果",
+				"info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+				"infoEmpty": "顯示第 0 至 0 項結果，共 0 項",
+				"infoFiltered": "(從 _MAX_ 項結果中過濾)",
+				"infoPostFix": "",
+				"search": "搜尋:",
+				"paginate": {
+					"first": "第一頁",
+					"previous": "上一頁",
+					"next": "下一頁",
+					"last": "最後一頁"
+				},
+				"aria": {
+					"sortAscending": ": 升冪排列",
+					"sortDescending": ": 降冪排列"
+				}
+			},
+			"responsive": true,
+			"lengthChange": true,
+			"autoWidth": false,
+			"order": [
+				[ 2, "desc" ]
+			],
+			"buttons": [
+				{
+					extend: 'excelHtml5',
+					text: 'Excel',
+					attr: {
+						id: 'download-button'
+					},
+					title: '',
+					filename: '{{ broker_group.Name }} ' + ' ' + begin_date + ' ' + end_date,
+					customize: function( xlsx ) {
+						setSheetName(xlsx, '買入');
+						addSheet(xlsx, '#negative-table', '', '賣出', '2');
+					}
+				}
+			]
+		}).buttons().container().appendTo('#positive-table_wrapper .col-md-6:eq(0)');
+		
+		$("#negative-table").DataTable({
+			"language": {
+				"processing": "處理中...",
+				"loadingRecords": "載入中...",
+				"lengthMenu": "顯示 _MENU_ 項結果",
+				"zeroRecords": "沒有符合的結果",
+				"info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+				"infoEmpty": "顯示第 0 至 0 項結果，共 0 項",
+				"infoFiltered": "(從 _MAX_ 項結果中過濾)",
+				"infoPostFix": "",
+				"search": "搜尋:",
+				"paginate": {
+					"first": "第一頁",
+					"previous": "上一頁",
+					"next": "下一頁",
+					"last": "最後一頁"
+				},
+				"aria": {
+					"sortAscending": ": 升冪排列",
+					"sortDescending": ": 降冪排列"
+				}
+			},
+			"responsive": true,
+			"lengthChange": true,
+			"autoWidth": false,
+			"order": [
+				[ 2, "asc" ]
+			],
+		});
+	});	
+</script>
+{% endblock script %}
