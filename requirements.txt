@@ -8,3 +8,4 @@ requests==2.24.0
 beautifulsoup4==4.9.3
 pandas==1.2.4
 openpyxl
+tables

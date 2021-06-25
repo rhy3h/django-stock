@@ -120,9 +120,8 @@ def IDToName(broker, branch):
     
     return {'branch_name': branch_name}
 
-def read_xlsx_append_data(stock, end_date):
+def read_xlsx_append_data(df, stock, end_date):
     try:
-        df = pd.read_excel(f'djangoapp/stockapp/files/xlsx/{stock.code}.xlsx')
         df = df[df['date'] <= end_date]
         df = df.reset_index()
         df = df[df.index < 20]
@@ -151,7 +150,12 @@ def CrawlerList(broker_branch, begin_date, end_date):
         i += 1
     for i in range(len(threads)):
         threads[i].join()
-    
+
+    end = time.time()
+    print(f"爬蟲時間: {round(end - start, 2)} 秒")
+
+    start = time.time()
+
     crawler_set_list.sort()
 
     stock_df = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')
@@ -194,27 +198,21 @@ def CrawlerList(broker_branch, begin_date, end_date):
         else:
             stock_table['negative'].append(stock)
         i = j
-    
-    threads = []
-    i = 0
-    while i < len(stock_table['positive']):
-        threads.append(threading.Thread(target = read_xlsx_append_data, args = (stock_table['positive'][i], end_date, )))
-        threads[i].start()
-        i += 1
-    
-    for i in range(len(threads)):
-        threads[i].join()
 
-    threads = []
-    i = 0
-    while i < len(stock_table['negative']):
-        threads.append(threading.Thread(target = read_xlsx_append_data, args = (stock_table['negative'][i], end_date, )))
-        threads[i].start()
-        i += 1
-    for i in range(len(threads)):
-        threads[i].join()
-
+    with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5',  mode='r') as newstore:
+        i = 0
+        while i < len(stock_table['positive']):
+            df_restored = newstore.select('code' + stock_table['positive'][i].code)
+            read_xlsx_append_data(df_restored, stock_table['positive'][i], end_date)
+            i += 1
+        
+        i = 0
+        while i < len(stock_table['negative']):
+            df_restored = newstore.select('code' + stock_table['negative'][i].code)
+            read_xlsx_append_data(df_restored, stock_table['negative'][i], end_date)
+            i += 1
+    
     end = time.time()
-    print(f"爬蟲時間: {round(end - start, 2)} 秒")
+    print(f"彙整時間: {round(end - start, 2)} 秒")
 
     return stock_table
