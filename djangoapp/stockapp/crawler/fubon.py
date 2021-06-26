@@ -9,6 +9,8 @@ from stockapp.crawler.wantgoo import CountContinuous
 
 import time
 
+from stockapp.tools import progress_bar
+
 class FubonStock:
     def __init__(self, code, name, diff, broker, branch):
         self.code = code
@@ -29,7 +31,7 @@ class Branch:
     def __lt__(self, other):
         return self.diff > other.diff
 
-class Stock:
+class StockClass:
     def __init__(self, code, name, diff):
         self.code = code
         self.name = name
@@ -147,12 +149,13 @@ def CrawlerList(broker_branch, begin_date, end_date):
     while i < len(broker_branch):
         threads.append(threading.Thread(target = crawler, args = (crawler_set_list, broker_branch[i].broker_code, broker_branch[i].branch_code, begin_date, end_date,)))
         threads[i].start()
+        progress_bar("爬蟲中: ", i + 1, len(broker_branch))
         i += 1
     for i in range(len(threads)):
         threads[i].join()
 
     end = time.time()
-    print(f"爬蟲時間: {round(end - start, 2)} 秒")
+    print(f"\n爬蟲時間: {round(end - start, 2)} 秒")
 
     start = time.time()
 
@@ -162,7 +165,7 @@ def CrawlerList(broker_branch, begin_date, end_date):
 
     i = 0
     while i < len(crawler_set_list):
-        stock = Stock(crawler_set_list[i].code, crawler_set_list[i].name, crawler_set_list[i].diff)
+        stock = StockClass(crawler_set_list[i].code, crawler_set_list[i].name, crawler_set_list[i].diff)
 
         branch_i_name = IDToName(crawler_set_list[i].broker, crawler_set_list[i].branch)['branch_name']
         branch_i = Branch(crawler_set_list[i].broker, branch_i_name, crawler_set_list[i].diff)
@@ -198,21 +201,35 @@ def CrawlerList(broker_branch, begin_date, end_date):
         else:
             stock_table['negative'].append(stock)
         i = j
-
+    
     with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5',  mode='r') as newstore:
+        count = 1
         i = 0
         while i < len(stock_table['positive']):
-            df_restored = newstore.select('code' + stock_table['positive'][i].code)
-            read_xlsx_append_data(df_restored, stock_table['positive'][i], end_date)
+            try:
+                df_restored = newstore.select('code' + stock_table['positive'][i].code)
+                read_xlsx_append_data(df_restored, stock_table['positive'][i], end_date)
+            except:
+                pass
+            
+            progress_bar("彙整中: ", count, len(stock_table['positive']) + len(stock_table['negative']))
+            count += 1
             i += 1
         
         i = 0
         while i < len(stock_table['negative']):
-            df_restored = newstore.select('code' + stock_table['negative'][i].code)
-            read_xlsx_append_data(df_restored, stock_table['negative'][i], end_date)
+            try:
+                df_restored = newstore.select('code' + stock_table['negative'][i].code)
+                read_xlsx_append_data(df_restored, stock_table['negative'][i], end_date)
+            except:
+                pass
+
+            progress_bar("彙整中: ", count, len(stock_table['positive']) + len(stock_table['negative']))
+            count += 1
+
             i += 1
     
     end = time.time()
-    print(f"彙整時間: {round(end - start, 2)} 秒")
+    print(f"\n彙整時間: {round(end - start, 2)} 秒")
 
     return stock_table

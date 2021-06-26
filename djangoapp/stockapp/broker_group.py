@@ -10,8 +10,6 @@ from stockapp.models import *
 
 from stockapp.crawler.fubon import NameToID, CrawlerList
 
-import os, csv, codecs
-
 from stockapp.crawler import wantgoo
 
 import pandas as pd
@@ -65,7 +63,7 @@ def upload(request, group_id):
     ).get(
         id = group_id
     )
-    broker_list = Broker.objects.filter(
+    broker_list = BrokerGroupItem.objects.filter(
         BrokerGroup = broker_group
     )
     
@@ -80,7 +78,7 @@ def upload(request, group_id):
             if item[0] == '奔':
                 item = '(牛牛牛)' + item[1:]
             broker_branch = NameToID(item)
-            Broker.objects.get_or_create(
+            BrokerGroupItem.objects.get_or_create(
                 BrokerGroup = broker_group,
                 Name = item,
                 Broker = broker_branch['broker_id'],
@@ -123,7 +121,7 @@ def index(request, group_id):
         id = group_id
     )
     title = '群組 ' + broker_group.Name
-    broker_list = Broker.objects.filter(
+    broker_list = BrokerGroupItem.objects.filter(
         BrokerGroup = broker_group
     )
     today = date.today().strftime("%Y-%m-%d")
