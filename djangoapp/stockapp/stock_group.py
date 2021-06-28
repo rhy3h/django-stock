@@ -5,6 +5,8 @@ from stockapp.models import *
 
 import pandas as pd
 
+from stockapp.crawler import wantgoo_crawler
+
 @login_required
 def base(request):
     User = request.user
@@ -18,7 +20,6 @@ def base(request):
 def index(request, group_id):
     User = request.user
     stock_group_list = StockGroup.objects.filter(Owner=User)
-    broker_group_list = BrokerGroup.objects.filter(Owner=User)
     
     stock_group = stock_group_list.get(id = group_id)
     title = '股票群組'
@@ -27,9 +28,22 @@ def index(request, group_id):
     stock_df['代碼名稱'] = stock_df['代碼'].astype(str) + ' ' + stock_df['商品']
     default_stock_list = stock_df['代碼名稱'].values.tolist()
 
-    stock_list = StockGroupItem.objects.filter(
+    stock_group_item_list = StockGroupItem.objects.filter(
         StockGroup = stock_group
     )
+
+    daily_candlestick = wantgoo_crawler.crawler_daily_candlestick(2330)
+    print(daily_candlestick)
+    
+    eps_data = wantgoo_crawler.crawler_eps_data(2330)
+    print(eps_data[0])
+
+    monthly_revenue_data = wantgoo_crawler.crawler_monthly_revenue_data(2330)
+    print(monthly_revenue_data[0])
+
+    if request.method == "POST":
+        print("")
+
     return render(request, 'stock-group.html', locals())
 
 @login_required

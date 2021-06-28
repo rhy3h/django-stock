@@ -1,6 +1,4 @@
 import pandas as pd
-import requests
-from pandas import json_normalize
 
 from itertools import groupby
 from django.http import JsonResponse
@@ -9,6 +7,8 @@ import threading
 import time
 
 from stockapp.tools import progress_bar
+
+from stockapp.crawler import wantgoo_crawler
 
 def CountContinuous(df):
     pd.options.mode.chained_assignment = None
@@ -72,31 +72,6 @@ def count_read_institutional_investors(request, code, end_date):
     
     return JsonResponse(data, safe=False)
 
-def crawler_institutional_investors(institutional_investors_data, code):
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    }
-
-    url = f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
-    
-    data = resource_page.json()
-    df = json_normalize(data)
-    
-    df['date'] = df['date'].str[:10]
-    df['sumForeign'] = df['sumForeignWithDealer'] + df['sumForeignNoDealer']
-    df = df.drop(columns=['sumForeignWithDealer', 'sumForeignNoDealer'])
-    df['sumDealer'] = df['sumDealerBySelf'] + df['sumDealerHedging']
-    df = df.drop(columns=['sumDealerBySelf', 'sumDealerHedging'])
-    df = df.drop(columns=['investrueId', 'foreignHolding', 'ingHolding', 'dealerHolding', 'foreignHoldingRate', 'sumHoldingRate'])
-
-    institutional_investors_data.append({
-        'code': code,
-        'df': df
-    })
-    return True
-
 def sync_institutional_investors():
     stock_list = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')['代碼'].values.tolist()
 
@@ -114,7 +89,7 @@ def sync_institutional_investors():
         j = 0
         while j < threads_number and i + j < len(stock_list):
             progress_bar("爬蟲中: ", i + j + 1, len(stock_list))
-            threads.append(threading.Thread(target = crawler_institutional_investors, args = (institutional_investors_data, stock_list[i + j], )))
+            threads.append(threading.Thread(target = wantgoo_crawler.crawler_institutional_investors, args = (institutional_investors_data, stock_list[i + j], )))
             threads[j].start()
             j += 1
         

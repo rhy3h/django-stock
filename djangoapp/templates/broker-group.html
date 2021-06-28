@@ -79,19 +79,19 @@
 						</a>
 					</h1>
 				</div>
-				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
+				<div class="col-sm-4 d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center">
 					<form method="POST" action="">
 						{% csrf_token %}
-						<div class="row no-gutters">
-							<div class="col-sm-5 col-12 mr-2">
+						<div class="row">
+							<div class="col-sm-5 col-12">
 								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
 								<input class="form-control" id="begin-date" name="begin-date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" onchange="sync_end_date()">
 							</div>
-							<div class="col-sm-5 col-12 mr-2">
+							<div class="col-sm-5 col-12">
 								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
 								<input class="form-control" id="end-date" name="end-date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
 							</div>
-							<div class="col-sm-1 col-12 mr-2">
+							<div class="col-sm-2 col-12">
 								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
 								<input class="btn btn-outline-primary" type="submit" value="搜尋" name="search">
 							</div>
