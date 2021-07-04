@@ -151,14 +151,22 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
             int(stock.code),
             stock.name,
             int(stock.diff),
-            buyin_list,
-            sellout_list,
+            stock.close,
+            stock.changeRate,
             stock.sumForeign,
             stock.sumING,
             stock.sumDealer,
             stock.capital,
             stock.industry,
             stock.status,
+            stock.five,
+            stock.ten,
+            stock.twenty,
+            stock.sixty,
+            stock.one_twenty,
+            stock.two_forty,
+            buyin_list,
+            sellout_list,
         ]
         positive_list.append(temp)
     for stock in negative_table:
@@ -172,18 +180,26 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
             int(stock.code),
             stock.name,
             int(stock.diff),
-            buyin_list,
-            sellout_list,
+            stock.close,
+            stock.changeRate,
             stock.sumForeign,
             stock.sumING,
             stock.sumDealer,
             stock.capital,
             stock.industry,
             stock.status,
+            stock.five,
+            stock.ten,
+            stock.twenty,
+            stock.sixty,
+            stock.one_twenty,
+            stock.two_forty,
+            buyin_list,
+            sellout_list,
         ]
         negative_list.append(temp)
         
-    colnames = ['股票代碼', '名稱', '差額(仟元)', '買進', '賣出', '外資', '投信', '自營商', '股本', '產業', '產業地位']
+    colnames = ['股票代碼', '名稱', '差額(仟元)', '收盤價', '漲跌幅(%)', '外資', '投信', '自營商', '股本', '產業', '產業地位', '5日(%)', '10日(%)', '20日(%)', '60日(%)', '120日(%)', '240日(%)', '買進', '賣出']
     df_positive = pd.DataFrame(positive_list, columns = colnames)
     df_negative = pd.DataFrame(negative_list, columns = colnames)
     writer = pd.ExcelWriter(f"djangoapp/stockapp/files/Save Files/群組 {broker_group_Name} {begin_date} {end_date}.xlsx", engine='xlsxwriter')
@@ -218,12 +234,12 @@ def read_historical_daily_candlesticks(df, stock):
     stock.changeRate = round((close - yesterday_close) / yesterday_close * 100, 2)
     
     try:
-        stock.five = count_historical_daily_candlesticks(df, 5)
-        stock.ten = count_historical_daily_candlesticks(df, 10)
-        stock.twenty = count_historical_daily_candlesticks(df, 20)
-        stock.sixty = count_historical_daily_candlesticks(df, 60)
-        stock.one_twenty = count_historical_daily_candlesticks(df, 120)
-        stock.two_forty = count_historical_daily_candlesticks(df, 240)
+        stock.five = round((count_historical_daily_candlesticks(df, 5) - stock.close) / stock.close * 100, 2)
+        stock.ten = round((count_historical_daily_candlesticks(df, 10) - stock.close) / stock.close * 100, 2)
+        stock.twenty = round((count_historical_daily_candlesticks(df, 20) - stock.close) / stock.close * 100, 2)
+        stock.sixty = round((count_historical_daily_candlesticks(df, 60) - stock.close) / stock.close * 100, 2)
+        stock.one_twenty = round((count_historical_daily_candlesticks(df, 120) - stock.close) / stock.close * 100, 2)
+        stock.two_forty = round((count_historical_daily_candlesticks(df, 240) - stock.close) / stock.close * 100, 2)
     except:
         pass
 

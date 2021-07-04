@@ -132,19 +132,19 @@
 										<th>名稱</th>
 										<th>差額(仟元)</th>
 										<th>收盤價</th>
-										<th>漲跌幅</th>
-										<th>5日</th>
-										<th>10日</th>
-										<th>20日</th>
-										<th>60日</th>
-										<th>120日</th>
-										<th>240日</th>
-										<th>產業</th>
-										<th>產業地位</th>
+										<th>漲跌幅(%)</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
 										<th>股本</th>
+										<th>產業</th>
+										<th>產業地位</th>
+										<th>5日(%)</th>
+										<th>10日(%)</th>
+										<th>20日(%)</th>
+										<th>60日(%)</th>
+										<th>120日(%)</th>
+										<th>240日(%)</th>
 										<th>買進</th>
 										<th>賣出</th>
 									</tr>
@@ -157,18 +157,18 @@
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>{{ stock.close }}</td>
 										<td>{{ stock.changeRate }}</td>
+										<td>{{ stock.sumForeign }}</td>
+										<td>{{ stock.sumING }}</td>
+										<td>{{ stock.sumDealer }}</td>
+										<td>{{ stock.capital }}</td>
+										<td>{{ stock.industry }}</td>
+										<td>{{ stock.status }}</td>
 										<td>{{ stock.five }}</td>
 										<td>{{ stock.ten }}</td>
 										<td>{{ stock.twenty }}</td>
 										<td>{{ stock.sixty }}</td>
 										<td>{{ stock.one_twenty }}</td>
 										<td>{{ stock.two_forty }}</td>
-										<td>{{ stock.industry }}</td>
-										<td>{{ stock.status }}</td>
-										<td>{{ stock.sumForeign }}</td>
-										<td>{{ stock.sumING }}</td>
-										<td>{{ stock.sumDealer }}</td>
-										<td>{{ stock.capital }}</td>
 										<td>
 											{% for buy in stock.buyin %}
 											{{ buy.name }}: {{ buy.diff|intcomma }}<br>
@@ -202,19 +202,19 @@
 										<th>名稱</th>
 										<th>差額(仟元)</th>
 										<th>收盤價</th>
-										<th>漲跌幅</th>
-										<th>5日</th>
-										<th>10日</th>
-										<th>20日</th>
-										<th>60日</th>
-										<th>120日</th>
-										<th>240日</th>
-										<th>產業</th>
-										<th>產業地位</th>
+										<th>漲跌幅(%)</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
 										<th>股本</th>
+										<th>產業</th>
+										<th>產業地位</th>
+										<th>5日(%)</th>
+										<th>10日(%)</th>
+										<th>20日(%)</th>
+										<th>60日(%)</th>
+										<th>120日(%)</th>
+										<th>240日(%)</th>
 										<th>買進</th>
 										<th>賣出</th>
 									</tr>
@@ -227,18 +227,18 @@
 										<td>{{ stock.diff|intcomma }}</td>
 										<td>{{ stock.close }}</td>
 										<td>{{ stock.changeRate }}</td>
+										<td>{{ stock.sumForeign }}</td>
+										<td>{{ stock.sumING }}</td>
+										<td>{{ stock.sumDealer }}</td>
+										<td>{{ stock.capital }}</td>
+										<td>{{ stock.industry }}</td>
+										<td>{{ stock.status }}</td>
 										<td>{{ stock.five }}</td>
 										<td>{{ stock.ten }}</td>
 										<td>{{ stock.twenty }}</td>
 										<td>{{ stock.sixty }}</td>
 										<td>{{ stock.one_twenty }}</td>
 										<td>{{ stock.two_forty }}</td>
-										<td>{{ stock.industry }}</td>
-										<td>{{ stock.status }}</td>
-										<td>{{ stock.sumForeign }}</td>
-										<td>{{ stock.sumING }}</td>
-										<td>{{ stock.sumDealer }}</td>
-										<td>{{ stock.capital }}</td>
 										<td>
 											{% for buy in stock.buyin %}
 											{{ buy.name }}: {{ buy.diff|intcomma }}<br>

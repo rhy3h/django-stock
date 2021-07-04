@@ -10,3 +10,4 @@ pandas==1.2.4
 openpyxl
 tables
 pyprobar
+xlsxwriter
