@@ -125,20 +125,28 @@
 							買入
 						</div>
 						<div class="card-body">
-							<table class="table table-bordered table-striped" id="positive-table" style="width:100%">
+							<table data-excel-name="買入" class="table table-bordered table-striped" id="positive-table" style="width:100%">
 								<thead>
 									<tr>
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
+										<th>收盤價</th>
+										<th>漲跌幅</th>
+										<th>5日</th>
+										<th>10日</th>
+										<th>20日</th>
+										<th>60日</th>
+										<th>120日</th>
+										<th>240日</th>
+										<th>產業</th>
+										<th>產業地位</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
 										<th>股本</th>
-										<th>產業</th>
-										<th>產業地位</th>
+										<th>買進</th>
+										<th>賣出</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -147,40 +155,33 @@
 										<td><a href="javascript:SearchWantGoo('{{ stock.code }}', '{{ stock.name }}')">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
 										<td>{{ stock.diff|intcomma }}</td>
-										<td>
-										{% for buy in stock.buyin %}
-										<p>{{ buy.name }}: {{ buy.diff|intcomma }}</p>
-										{% endfor %}
-										</td>
-										<td>
-										{% for sell in stock.sellout %}
-										<p>{{ sell.name }}: {{ sell.diff|intcomma }}</p>
-										{% endfor %}
-										</td>
+										<td>{{ stock.close }}</td>
+										<td>{{ stock.changeRate }}</td>
+										<td>{{ stock.five }}</td>
+										<td>{{ stock.ten }}</td>
+										<td>{{ stock.twenty }}</td>
+										<td>{{ stock.sixty }}</td>
+										<td>{{ stock.one_twenty }}</td>
+										<td>{{ stock.two_forty }}</td>
+										<td>{{ stock.industry }}</td>
+										<td>{{ stock.status }}</td>
 										<td>{{ stock.sumForeign }}</td>
 										<td>{{ stock.sumING }}</td>
 										<td>{{ stock.sumDealer }}</td>
 										<td>{{ stock.capital }}</td>
-										<td>{{ stock.industry }}</td>
-										<td>{{ stock.status }}</td>
+										<td>
+											{% for buy in stock.buyin %}
+											{{ buy.name }}: {{ buy.diff|intcomma }}<br>
+											{% endfor %}
+											</td>
+											<td>
+											{% for sell in stock.sellout %}
+											{{ sell.name }}: {{ sell.diff|intcomma }}<br>
+											{% endfor %}
+										</td>
 									</tr>
 									{% endfor %}
 								</tbody>
-								<tfoot>
-									<tr>
-										<th>股票代碼</th>
-										<th>名稱</th>
-										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
-										<th>外資</th>
-										<th>投信</th>
-										<th>自營商</th>
-										<th>股本</th>
-										<th>產業</th>
-										<th>產業地位</th>
-									</tr>
-								</tfoot>
 							</table>
 						</div>
 					</div>		
@@ -194,20 +195,28 @@
 							賣出
 						</div>
 						<div class="card-body">
-							<table class="table table-bordered table-striped" id="negative-table" style="width:100%">
+							<table data-excel-name="賣出" class="table table-bordered table-striped" id="negative-table" style="width:100%">
 								<thead>
 									<tr>
 										<th>股票代碼</th>
 										<th>名稱</th>
 										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
+										<th>收盤價</th>
+										<th>漲跌幅</th>
+										<th>5日</th>
+										<th>10日</th>
+										<th>20日</th>
+										<th>60日</th>
+										<th>120日</th>
+										<th>240日</th>
+										<th>產業</th>
+										<th>產業地位</th>
 										<th>外資</th>
 										<th>投信</th>
 										<th>自營商</th>
 										<th>股本</th>
-										<th>產業</th>
-										<th>產業地位</th>
+										<th>買進</th>
+										<th>賣出</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -216,40 +225,33 @@
 										<td><a href="javascript:SearchWantGoo('{{ stock.code }}', '{{ stock.name }}')">{{ stock.code }}</a></td>
 										<td>{{ stock.name }}</td>
 										<td>{{ stock.diff|intcomma }}</td>
-										<td>
-										{% for buy in stock.buyin %}
-										<p>{{ buy.name }}: {{ buy.diff|intcomma }}</p>
-										{% endfor %}
-										</td>
-										<td>
-										{% for sell in stock.sellout %}
-										<p>{{ sell.name }}: {{ sell.diff|intcomma }}</p>
-										{% endfor %}
-										</td>
+										<td>{{ stock.close }}</td>
+										<td>{{ stock.changeRate }}</td>
+										<td>{{ stock.five }}</td>
+										<td>{{ stock.ten }}</td>
+										<td>{{ stock.twenty }}</td>
+										<td>{{ stock.sixty }}</td>
+										<td>{{ stock.one_twenty }}</td>
+										<td>{{ stock.two_forty }}</td>
+										<td>{{ stock.industry }}</td>
+										<td>{{ stock.status }}</td>
 										<td>{{ stock.sumForeign }}</td>
 										<td>{{ stock.sumING }}</td>
 										<td>{{ stock.sumDealer }}</td>
 										<td>{{ stock.capital }}</td>
-										<td>{{ stock.industry }}</td>
-										<td>{{ stock.status }}</td>
+										<td>
+											{% for buy in stock.buyin %}
+											{{ buy.name }}: {{ buy.diff|intcomma }}<br>
+											{% endfor %}
+											</td>
+											<td>
+											{% for sell in stock.sellout %}
+											{{ sell.name }}: {{ sell.diff|intcomma }}<br>
+											{% endfor %}
+										</td>
 									</tr>
 									{% endfor %}
 								</tbody>
-								<tfoot>
-									<tr>
-										<th>股票代碼</th>
-										<th>名稱</th>
-										<th>差額(仟元)</th>
-										<th>買進</th>
-										<th>賣出</th>
-										<th>外資</th>
-										<th>投信</th>
-										<th>自營商</th>
-										<th>股本</th>
-										<th>產業</th>
-										<th>產業地位</th>
-									</tr>
-								</tfoot>
 							</table>
 						</div>
 					</div>
@@ -504,13 +506,12 @@
 	}
 
 	function download(){
-		$("#download-button").click();
+		begin_date = document.getElementById("begin-date").value;
+		end_date = document.getElementById("end-date").value;
+		location.href = 'download?begin_date=' + begin_date + '&end_date=' + end_date;
 	}
 	
 	$(document).ready( function () {
-		begin_date = document.getElementById("begin-date").value;
-		end_date = document.getElementById("end-date").value;
-		
 		$("#positive-table").DataTable({
 			"language": {
 				"processing": "處理中...",
@@ -533,29 +534,15 @@
 					"sortDescending": ": 降冪排列"
 				}
 			},
+			"fixedHeader": true,
 			"responsive": true,
 			"lengthChange": true,
 			"autoWidth": false,
 			"order": [
 				[ 2, "desc" ]
 			],
-			"buttons": [
-				{
-					extend: 'excelHtml5',
-					text: 'Excel',
-					attr: {
-						id: 'download-button'
-					},
-					title: '',
-					filename: '{{ broker_group.Name }} ' + ' ' + begin_date + ' ' + end_date,
-					customize: function( xlsx ) {
-						setSheetName(xlsx, '買入');
-						addSheet(xlsx, '#negative-table', '', '賣出', '2');
-					}
-				}
-			]
-		}).buttons().container().appendTo('#positive-table_wrapper .col-md-6:eq(0)');
-		
+		});
+
 		$("#negative-table").DataTable({
 			"language": {
 				"processing": "處理中...",
@@ -578,6 +565,7 @@
 					"sortDescending": ": 降冪排列"
 				}
 			},
+			"fixedHeader": true,
 			"responsive": true,
 			"lengthChange": true,
 			"autoWidth": false,

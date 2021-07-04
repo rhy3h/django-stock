@@ -17,6 +17,7 @@ urlpatterns = [
     path('broker-group/<int:group_id>/delete', broker_group.delete),
     path('broker-group/<int:group_id>/upload', broker_group.upload),
     path('broker-group/<int:group_id>/sync/', broker_group.sync),
+    path('broker-group/<int:group_id>/download', broker_group.download),
 
     path('leaderboard/', leaderboard.index),
     

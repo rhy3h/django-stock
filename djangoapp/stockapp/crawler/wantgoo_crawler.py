@@ -1,5 +1,6 @@
 import requests
 from pandas import json_normalize
+import pandas as pd
 
 # 三大法人買賣超
 def crawler_institutional_investors(institutional_investors_data, code):
@@ -22,6 +23,29 @@ def crawler_institutional_investors(institutional_investors_data, code):
     df = df.drop(columns=['investrueId', 'foreignHolding', 'ingHolding', 'dealerHolding', 'foreignHoldingRate', 'sumHoldingRate'])
 
     institutional_investors_data.append({
+        'code': code,
+        'df': df
+    })
+    return True
+
+# 趨勢分析
+def crawler_historical_daily_candlesticks(historical_daily_candlesticks_data, code, today_timestamp):
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
+    }
+
+    url = f"https://www.wantgoo.com/investrue/{code}/historical-daily-candlesticks?before={today_timestamp}&top=240"
+    resource_page = requests.get(url, headers = headers)
+    resource_page.encoding = 'utf-8'
+    
+    data = resource_page.json()
+    df = json_normalize(data)
+
+    df = df.drop(columns=['tradeDate'])
+    df['time'] = df['time'].add(28800000)
+    df['time'] = pd.to_datetime(df['time'], unit='ms')
+    
+    historical_daily_candlesticks_data.append({
         'code': code,
         'df': df
     })

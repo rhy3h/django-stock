@@ -32,7 +32,7 @@ def read_institutional_investors(request, code, end_date):
     data = []
     
     try:
-        df = pd.read_csv(f'djangoapp/stockapp/files/csv/{code}.csv')
+        df = pd.read_csv(f'djangoapp/stockapp/files/institutional-investors/{code}.csv')
         df = df[df['date'] <= end_date]
         df = df.reset_index()
         df = df[df.index < 20]
@@ -57,7 +57,7 @@ def count_read_institutional_investors(request, code, end_date):
     data = []
     
     try:
-        df = pd.read_csv(f'djangoapp/stockapp/files/csv/{code}.csv')
+        df = pd.read_csv(f'djangoapp/stockapp/files/institutional-investors/{code}.csv')
         df = df[df['date'] <= end_date]
         df = df.reset_index()
         df = df[df.index < 20]
@@ -74,8 +74,6 @@ def count_read_institutional_investors(request, code, end_date):
 
 def sync_institutional_investors():
     stock_list = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')['代碼'].values.tolist()
-
-    path = 'djangoapp/stockapp/files/xlsx/'
     
     start = time.time()
     
@@ -109,8 +107,54 @@ def sync_institutional_investors():
         while i < len(institutional_investors_data):
             code = institutional_investors_data[i]['code']
             code_name = f'code{code}'
-            institutional_investors_data[i]['df'].to_csv(f'djangoapp/stockapp/files/csv/{code}.csv', index = 0)
+            institutional_investors_data[i]['df'].to_csv(f'djangoapp/stockapp/files/institutional-investors/{code}.csv', index = 0)
             store.append(code_name, institutional_investors_data[i]['df'],  data_columns=['date'], format='table')
+            
+            progress_bar("存檔中: ", i + 1, len(stock_list))
+            i += 1
+
+    end = time.time()
+    print(f"\n存檔時間: {int(end - start)}秒")
+
+    return True
+
+def sync_historical_daily_candlesticks(today_timestamp):
+    stock_list = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')['代碼'].values.tolist()
+    
+    start = time.time()
+    
+    historical_daily_candlesticks_data = []
+    estimate = 3
+    threads_number = 50
+    last_time = (len(stock_list) / threads_number) * estimate
+    i = 0
+    while i < len(stock_list):
+        threads = []
+        j = 0
+        while j < threads_number and i + j < len(stock_list):
+            progress_bar("爬蟲中: ", i + j + 1, len(stock_list))
+            threads.append(threading.Thread(target = wantgoo_crawler.crawler_historical_daily_candlesticks, args = (historical_daily_candlesticks_data, stock_list[i + j], today_timestamp)))
+            threads[j].start()
+            j += 1
+        
+        for j in range(len(threads)):
+            threads[j].join()
+        
+        last_time -= estimate
+        i += threads_number
+    end = time.time()
+    min = int((end - start) / 60)
+    sec = int((end - start) % 60)
+    print(f"\n爬蟲時間: {min}分:{sec}秒")
+
+    start = time.time()
+    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5',  mode='w') as store:
+        i = 0
+        while i < len(historical_daily_candlesticks_data):
+            code = historical_daily_candlesticks_data[i]['code']
+            code_name = f'code{code}'
+            historical_daily_candlesticks_data[i]['df'].to_csv(f'djangoapp/stockapp/files/historical-daily-candlesticks/{code}.csv', index = 0)
+            store.append(code_name, historical_daily_candlesticks_data[i]['df'],  data_columns=['date'], format='table')
             
             progress_bar("存檔中: ", i + 1, len(stock_list))
             i += 1

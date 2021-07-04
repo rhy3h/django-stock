@@ -44,6 +44,17 @@ class StockClass:
         self.capital = None
         self.industry = None
         self.status = None
+        self.five = None
+        self.ten = None
+        self.twenty = None
+        self.sixty = None
+        self.one_twenty = None
+        self.two_forty = None
+        self.close = None
+        self.changeRate = None
+        
+    def __lt__(self, other):
+        return self.diff > other.diff
 
 def crawler(crawler_set_list, broker, branch, begin_date, end_date):
     url = "https://fubon-ebrokerdj.fbs.com.tw/z/zg/zgb/zgb0.djhtm?a=" + broker + "&b=" + branch + "&c=B&e=" + begin_date + "&f=" + end_date
@@ -122,7 +133,66 @@ def IDToName(broker, branch):
     
     return {'branch_name': branch_name}
 
-def read_xlsx_append_data(df, stock, end_date):
+def SaveList(stock_table, broker_group_Name, begin_date, end_date):
+    positive_table = stock_table['positive']
+    positive_list = []
+    negative_table = stock_table['negative']
+    negative_list = []
+    
+    for stock in positive_table:
+        buyin_list = ""
+        for buyin in stock.buyin:
+            buyin_list += f"{buyin.name}: {buyin.diff} "
+        sellout_list = ""
+        for sellout in stock.sellout:
+            sellout_list += f"{sellout.name}: {sellout.diff} "
+
+        temp = [
+            int(stock.code),
+            stock.name,
+            int(stock.diff),
+            buyin_list,
+            sellout_list,
+            stock.sumForeign,
+            stock.sumING,
+            stock.sumDealer,
+            stock.capital,
+            stock.industry,
+            stock.status,
+        ]
+        positive_list.append(temp)
+    for stock in negative_table:
+        buyin_list = ""
+        for buyin in stock.buyin:
+            buyin_list += f"{buyin.name}: {buyin.diff} "
+        sellout_list = ""
+        for sellout in stock.sellout:
+            sellout_list += f"{sellout.name}: {sellout.diff} "
+        temp = [
+            int(stock.code),
+            stock.name,
+            int(stock.diff),
+            buyin_list,
+            sellout_list,
+            stock.sumForeign,
+            stock.sumING,
+            stock.sumDealer,
+            stock.capital,
+            stock.industry,
+            stock.status,
+        ]
+        negative_list.append(temp)
+        
+    colnames = ['股票代碼', '名稱', '差額(仟元)', '買進', '賣出', '外資', '投信', '自營商', '股本', '產業', '產業地位']
+    df_positive = pd.DataFrame(positive_list, columns = colnames)
+    df_negative = pd.DataFrame(negative_list, columns = colnames)
+    writer = pd.ExcelWriter(f"djangoapp/stockapp/files/Save Files/群組 {broker_group_Name} {begin_date} {end_date}.xlsx", engine='xlsxwriter')
+    df_positive.to_excel(writer, sheet_name='買入', index=False)
+    df_negative.to_excel(writer, sheet_name='賣出', index=False)
+    
+    writer.save()
+
+def read_institutional_investors(df, stock, end_date):
     try:
         df = df[df['date'] <= end_date]
         df = df.reset_index()
@@ -131,6 +201,29 @@ def read_xlsx_append_data(df, stock, end_date):
         stock.sumING = CountContinuous(df['sumING'])
         stock.sumForeign = CountContinuous(df['sumForeign'])
         stock.sumDealer = CountContinuous(df['sumDealer'])
+    except:
+        pass
+
+def count_historical_daily_candlesticks(df, days):
+    df = df[df.index < days]
+    return round(df['close'].mean(), 2)
+    
+def read_historical_daily_candlesticks(df, stock):
+    df = df.reset_index()
+
+    yesterday_close = df[df.index == 1]['close'].values[0]
+    close = df[df.index == 0]['close'].values[0]
+    
+    stock.close = round(close, 2)
+    stock.changeRate = round((close - yesterday_close) / yesterday_close * 100, 2)
+    
+    try:
+        stock.five = count_historical_daily_candlesticks(df, 5)
+        stock.ten = count_historical_daily_candlesticks(df, 10)
+        stock.twenty = count_historical_daily_candlesticks(df, 20)
+        stock.sixty = count_historical_daily_candlesticks(df, 60)
+        stock.one_twenty = count_historical_daily_candlesticks(df, 120)
+        stock.two_forty = count_historical_daily_candlesticks(df, 240)
     except:
         pass
 
@@ -202,17 +295,22 @@ def CrawlerList(broker_branch, begin_date, end_date):
             stock_table['negative'].append(stock)
         i = j
     
+    stock_table['positive'].sort()
+    stock_table['negative'].sort(reverse=True)
+
     with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5',  mode='r') as newstore:
-        count = 1
         i = 0
+        count = 1
+        length = len(stock_table['positive']) + len(stock_table['negative'])
+
         while i < len(stock_table['positive']):
             try:
                 df_restored = newstore.select('code' + stock_table['positive'][i].code)
-                read_xlsx_append_data(df_restored, stock_table['positive'][i], end_date)
+                read_institutional_investors(df_restored, stock_table['positive'][i], end_date)
             except:
                 pass
             
-            progress_bar("彙整中: ", count, len(stock_table['positive']) + len(stock_table['negative']))
+            progress_bar("彙整中: ", count, length)
             count += 1
             i += 1
         
@@ -220,11 +318,40 @@ def CrawlerList(broker_branch, begin_date, end_date):
         while i < len(stock_table['negative']):
             try:
                 df_restored = newstore.select('code' + stock_table['negative'][i].code)
-                read_xlsx_append_data(df_restored, stock_table['negative'][i], end_date)
+                read_institutional_investors(df_restored, stock_table['negative'][i], end_date)
             except:
                 pass
 
-            progress_bar("彙整中: ", count, len(stock_table['positive']) + len(stock_table['negative']))
+            progress_bar("彙整中: ", count, length)
+            count += 1
+
+            i += 1
+    print()
+    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5',  mode='r') as newstore:
+        i = 0
+        count = 1
+        length = len(stock_table['positive']) + len(stock_table['negative'])
+        
+        while i < len(stock_table['positive']):
+            try:
+                df_restored = newstore.select('code' + stock_table['positive'][i].code)
+                read_historical_daily_candlesticks(df_restored, stock_table['positive'][i])
+            except:
+                pass
+            
+            progress_bar("彙整中: ", count, length)
+            count += 1
+            i += 1
+        
+        i = 0
+        while i < len(stock_table['negative']):
+            try:
+                df_restored = newstore.select('code' + stock_table['negative'][i].code)
+                read_historical_daily_candlesticks(df_restored, stock_table['negative'][i])
+            except:
+                pass
+
+            progress_bar("彙整中: ", count, length)
             count += 1
 
             i += 1

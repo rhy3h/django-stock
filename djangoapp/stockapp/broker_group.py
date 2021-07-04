@@ -2,22 +2,20 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
+from stockapp import models
+from stockapp.crawler.fubon import NameToID, CrawlerList, SaveList
+from stockapp.crawler import wantgoo
+
 from django.utils.encoding import escape_uri_path
 
 from datetime import date, datetime, timedelta
-
-from stockapp.models import *
-
-from stockapp.crawler.fubon import NameToID, CrawlerList
-
-from stockapp.crawler import wantgoo
-
 import pandas as pd
+
 
 @login_required
 def base(request):
     User = request.user
-    broker_group_list = BrokerGroup.objects.filter(
+    broker_group_list = models.BrokerGroup.objects.filter(
         Owner = User
     )
     
@@ -31,11 +29,11 @@ def create(request):
     if request.method == "POST":
         new_group_name = request.POST['new-group-name']
         User = request.user
-        BrokerGroup.objects.get_or_create(
+        models.BrokerGroup.objects.get_or_create(
             Owner = User,
             Name = new_group_name
         )
-        broker_group = BrokerGroup.objects.filter(
+        broker_group = models.BrokerGroup.objects.filter(
             Owner=User
         ).last()
 
@@ -46,7 +44,7 @@ def edit(request, group_id):
     if request.method == "POST":
         User = request.user
         edit_group_name = request.POST['edit-group-name']
-        broker_group = BrokerGroup.objects.get(
+        broker_group = models.BrokerGroup.objects.get(
             Owner = User,
             id = group_id
         )
@@ -58,12 +56,12 @@ def edit(request, group_id):
 @login_required
 def upload(request, group_id):
     User = request.user
-    broker_group = BrokerGroup.objects.filter(
+    broker_group = models.BrokerGroup.objects.filter(
         Owner = User
     ).get(
         id = group_id
     )
-    broker_list = BrokerGroupItem.objects.filter(
+    broker_list = models.BrokerGroupItem.objects.filter(
         BrokerGroup = broker_group
     )
     
@@ -78,7 +76,7 @@ def upload(request, group_id):
             if item[0] == '奔':
                 item = '(牛牛牛)' + item[1:]
             broker_branch = NameToID(item)
-            BrokerGroupItem.objects.get_or_create(
+            models.BrokerGroupItem.objects.get_or_create(
                 BrokerGroup = broker_group,
                 Name = item,
                 Broker = broker_branch['broker_id'],
@@ -90,7 +88,13 @@ def upload(request, group_id):
 @login_required
 def sync(request, group_id):
     
+    print("三大法人買賣超")
     wantgoo.sync_institutional_investors()
+    
+    print("趨勢分析")
+    today_string = date.today().strftime("%Y-%m-%d")
+    today_timestamp = int(time.mktime(datetime.strptime(today_string, "%Y-%m-%d").timetuple()) * 1000)
+    wantgoo.sync_historical_daily_candlesticks(today_timestamp)
     
     return JsonResponse([], safe=False)
 
@@ -98,7 +102,7 @@ def sync(request, group_id):
 def delete(request, group_id):
     if request.method == "POST":
         User = request.user
-        broker_group = BrokerGroup.objects.get(
+        broker_group = models.BrokerGroup.objects.get(
             Owner = User,
             id = group_id
         )
@@ -106,28 +110,50 @@ def delete(request, group_id):
 
     return redirect('/broker-group/')
 
+@login_required
+def download(request, group_id):
+    try:
+        User = request.user
+        broker_group = models.BrokerGroup.objects.get(
+            Owner = User,
+            id = group_id
+        )
+        begin_date = request.GET['begin_date']
+        end_date = request.GET['end_date']
+        filename = f'群組 {broker_group.Name} {begin_date} {end_date}.xlsx'
+        with open('djangoapp/stockapp/files/Save Files/' + filename, 'rb') as model_excel:
+            result = model_excel.read()
+        response = HttpResponse(result, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename={}'.format(escape_uri_path(filename))
+
+        return response
+    except:
+        pass
+
 class ClsBroker:
     def __init__(self, broker, branch):
         self.broker_code = broker
         self.branch_code = branch
 
+import time
+
 @login_required
 def index(request, group_id):
     User = request.user
-    broker_group_list = BrokerGroup.objects.filter(
+    broker_group_list = models.BrokerGroup.objects.filter(
         Owner = User
     )
     broker_group = broker_group_list.get(
         id = group_id
     )
     title = '群組 ' + broker_group.Name
-    broker_list = BrokerGroupItem.objects.filter(
+    broker_list = models.BrokerGroupItem.objects.filter(
         BrokerGroup = broker_group
     )
     today = date.today().strftime("%Y-%m-%d")
     begin_date = today
     end_date = today
-
+    
     if request.POST.get('search'):
         begin_date = request.POST.get('begin-date')
         begin_datatime = datetime.strptime(begin_date, "%Y-%m-%d")
@@ -146,5 +172,6 @@ def index(request, group_id):
         for broker in broker_list:
             broker_branch.append(ClsBroker(broker.Broker, broker.Branch))
         stock_table = CrawlerList(broker_branch, begin_date, end_date)
-
+        SaveList(stock_table, broker_group.Name, begin_date, end_date)
+        
     return render(request, 'broker-group.html', locals())
