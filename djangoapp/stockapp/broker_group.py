@@ -89,7 +89,7 @@ def upload(request, group_id):
 def sync(request, group_id):
     
     print("三大法人買賣超")
-    # wantgoo.sync_institutional_investors()
+    wantgoo.sync_institutional_investors()
     
     print("趨勢分析")
     tomorrow = date.today() + timedelta(days = 1)

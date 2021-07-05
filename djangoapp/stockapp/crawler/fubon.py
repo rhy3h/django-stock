@@ -75,11 +75,13 @@ def crawler(crawler_set_list, broker, branch, begin_date, end_date):
             code_name = stock_name[i].script.string[first_index:last_index].replace('\'', '')
             code = code_name.split(',')[0][2:]
             name = code_name.split(',')[1]
+            
             diff = int(stock_price[i * 3 + 2].string.string.replace(',', ''))
             fubon_stock = FubonStock(code, name, diff, broker, branch)
             crawler_list.append(fubon_stock)
         except:
             pass
+
         i += 1
     
     for item in crawler_list:
@@ -274,15 +276,22 @@ def CrawlerList(broker_branch, begin_date, end_date):
 
     threads = []
     crawler_set_list = []
+    threads_number = 5
     i = 0
     while i < len(broker_branch):
-        threads.append(threading.Thread(target = crawler, args = (crawler_set_list, broker_branch[i].broker_code, broker_branch[i].branch_code, begin_date, end_date,)))
-        threads[i].start()
-        progress_bar("爬蟲中: ", i + 1, len(broker_branch))
-        i += 1
-    for i in range(len(threads)):
-        threads[i].join()
-
+        threads = []
+        j = 0
+        while j < threads_number and i + j < len(broker_branch):
+            progress_bar("爬蟲中: ", i + j + 1, len(broker_branch))
+            threads.append(threading.Thread(target = crawler, args = (crawler_set_list, broker_branch[i + j].broker_code, broker_branch[i + j].branch_code, begin_date, end_date, )))
+            threads[j].start()
+            j += 1
+        
+        for j in range(len(threads)):
+            threads[j].join()
+        
+        i += threads_number
+    
     end = time.time()
     print(f"\n爬蟲時間: {round(end - start, 2)} 秒")
 
@@ -291,7 +300,7 @@ def CrawlerList(broker_branch, begin_date, end_date):
     crawler_set_list.sort()
 
     stock_df = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')
-
+    
     i = 0
     while i < len(crawler_set_list):
         stock = StockClass(crawler_set_list[i].code, crawler_set_list[i].name, crawler_set_list[i].diff)
@@ -302,9 +311,10 @@ def CrawlerList(broker_branch, begin_date, end_date):
             stock.buyin.append(branch_i)
         else:
             stock.sellout.append(branch_i)
-
+        
         j = i + 1
         while j < len(crawler_set_list) and crawler_set_list[i].code == crawler_set_list[j].code:
+
             branch_j_name = IDToName(crawler_set_list[j].broker, crawler_set_list[j].branch)['branch_name']
             branch_j = Branch(crawler_set_list[j].branch, branch_j_name, crawler_set_list[j].diff)
             if crawler_set_list[j].diff > 0:
@@ -314,7 +324,7 @@ def CrawlerList(broker_branch, begin_date, end_date):
             
             stock.diff += crawler_set_list[j].diff
             j += 1
-
+        
         stock.buyin.sort()
         stock.sellout.sort(reverse=True)
         

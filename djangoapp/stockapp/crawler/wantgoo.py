@@ -78,9 +78,7 @@ def sync_institutional_investors():
     start = time.time()
     
     institutional_investors_data = []
-    estimate = 3
     threads_number = 50
-    last_time = (len(stock_list) / threads_number) * estimate
     i = 0
     while i < len(stock_list):
         threads = []
@@ -94,7 +92,6 @@ def sync_institutional_investors():
         for j in range(len(threads)):
             threads[j].join()
         
-        last_time -= estimate
         i += threads_number
     end = time.time()
     min = int((end - start) / 60)
@@ -124,9 +121,7 @@ def sync_historical_daily_candlesticks(today_timestamp):
     start = time.time()
     
     historical_daily_candlesticks_data = []
-    estimate = 3
     threads_number = 50
-    last_time = (len(stock_list) / threads_number) * estimate
     i = 0
     while i < len(stock_list):
         threads = []
@@ -140,8 +135,8 @@ def sync_historical_daily_candlesticks(today_timestamp):
         for j in range(len(threads)):
             threads[j].join()
         
-        last_time -= estimate
         i += threads_number
+
     end = time.time()
     min = int((end - start) / 60)
     sec = int((end - start) % 60)

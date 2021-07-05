@@ -27,7 +27,7 @@ def CombineRepeat(dict_list, dates):
     
     i = 0
     while i < len(dict_list):
-        stock = Stock(dict_list[i]['股票代碼'], dict_list[i]['名稱'], dict_list[i]['差額(仟元)'])
+        stock = Stock(dict_list[i]['代碼'], dict_list[i]['股票'], dict_list[i]['差額(仟元)'])
         stock.date.append(dict_list[i]['日期'])
         stock.sumForeign = dict_list[i]['外資']
         stock.sumING = dict_list[i]['投信']
@@ -37,7 +37,7 @@ def CombineRepeat(dict_list, dates):
         stock.status = dict_list[i]['產業地位']
         
         j = i + 1
-        while j < len(dict_list) and dict_list[i]['股票代碼'] == dict_list[j]['股票代碼']:
+        while j < len(dict_list) and dict_list[i]['代碼'] == dict_list[j]['代碼']:
             stock.diff += dict_list[j]['差額(仟元)']
             stock.date.append(dict_list[j]['日期'])
             j += 1
@@ -49,7 +49,7 @@ def CombineRepeat(dict_list, dates):
         stock.days = day
         
         data.append(stock)
-        i += 1
+        i = j
 
     return data
 
@@ -88,9 +88,12 @@ def index(request):
         sellout_df = sellout_df.reset_index()
         buy_df = buy_df.drop(columns=['index', '買進', '賣出'])
         sellout_df = sellout_df.drop(columns=['index', '買進', '賣出'])
-        buy_df = buy_df.sort_values(by=['股票代碼', '日期'], ascending = (True, False))
-        sellout_df = sellout_df.sort_values(by=['股票代碼', '日期'], ascending = (True, False))
+        buy_df = buy_df.sort_values(by=['代碼', '日期'], ascending = (True, False))
+        sellout_df = sellout_df.sort_values(by=['代碼', '日期'], ascending = (True, False))
         
+        # buyin_list.sort()
+        # sellout_list.sort()
+
         buyin_list = CombineRepeat(list(buy_df.T.to_dict().values()), dates)
         sellout_list = CombineRepeat(list(sellout_df.T.to_dict().values()), dates)
 

@@ -32,18 +32,6 @@ def index(request, group_id):
         StockGroup = stock_group
     )
 
-    daily_candlestick = wantgoo_crawler.crawler_daily_candlestick(2330)
-    print(daily_candlestick)
-    
-    eps_data = wantgoo_crawler.crawler_eps_data(2330)
-    print(eps_data[0])
-
-    monthly_revenue_data = wantgoo_crawler.crawler_monthly_revenue_data(2330)
-    print(monthly_revenue_data[0])
-
-    if request.method == "POST":
-        print("")
-
     return render(request, 'stock-group.html', locals())
 
 @login_required
