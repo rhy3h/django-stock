@@ -121,7 +121,7 @@ def download(request, group_id):
         )
         begin_date = request.GET['begin_date']
         end_date = request.GET['end_date']
-        filename = f'群組 {broker_group.Name} {begin_date} {end_date}.xlsx'
+        filename = f'{broker_group.Name} {begin_date} {end_date}.xlsx'
         with open('djangoapp/stockapp/files/Save Files/' + filename, 'rb') as model_excel:
             result = model_excel.read()
         response = HttpResponse(result, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
