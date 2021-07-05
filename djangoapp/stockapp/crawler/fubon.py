@@ -202,7 +202,7 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
     colnames = ['代碼', '股票', '差額(仟元)', '收盤價', '漲跌幅(%)', '外資', '投信', '自營商', '股本', '產業', '產業地位', '5日(%)', '10日(%)', '20日(%)', '60日(%)', '120日(%)', '240日(%)', '買進', '賣出']
     df_positive = pd.DataFrame(positive_list, columns = colnames)
     df_negative = pd.DataFrame(negative_list, columns = colnames)
-    writer = pd.ExcelWriter(f"djangoapp/stockapp/files/Save Files/群組 {broker_group_Name} {begin_date} {end_date}.xlsx", engine='xlsxwriter')
+    writer = pd.ExcelWriter(f"djangoapp/stockapp/files/Save Files/{broker_group_Name} {begin_date} {end_date}.xlsx", engine='xlsxwriter')
     df_positive.to_excel(writer, sheet_name='買入', index=False)
     df_negative.to_excel(writer, sheet_name='賣出', index=False)
 
