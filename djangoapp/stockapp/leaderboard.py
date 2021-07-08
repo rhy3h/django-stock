@@ -93,6 +93,8 @@ def index(request):
         
         # buyin_list.sort()
         # sellout_list.sort()
+        buy_df.sort_values(by=['差額(仟元) ', 'col2'])
+        print(buy_df)
 
         buyin_list = CombineRepeat(list(buy_df.T.to_dict().values()), dates)
         sellout_list = CombineRepeat(list(sellout_df.T.to_dict().values()), dates)

@@ -96,10 +96,11 @@ def NameToID(name):
         broker_name = name.split('-')[0]
     else:
         broker_name = name
-
+    
     i = 0
     while i < len(BrokerList):
         broker_id_name = BrokerList[i][0].split(',')
+
         if broker_id_name[1].find(broker_name) > -1:
             broker_id = broker_id_name[0]
             j = 1
@@ -111,7 +112,7 @@ def NameToID(name):
                 j += 1
             break
         i += 1
-
+    print(broker_id, branch_id)
     return {'broker_id': broker_id, 'branch_id':  branch_id}
 
 def IDToName(broker, branch):

@@ -73,8 +73,6 @@ def upload(request, group_id):
         data = pd.read_excel(uploadfile)['名稱'].values.tolist()
         
         for item in data:
-            if item[0] == '奔':
-                item = '(牛牛牛)' + item[1:]
             broker_branch = NameToID(item)
             models.BrokerGroupItem.objects.get_or_create(
                 BrokerGroup = broker_group,
