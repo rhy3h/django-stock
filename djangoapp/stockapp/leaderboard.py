@@ -13,8 +13,8 @@ class Stock:
         self.code = code
         self.name = name
         self.diff = diff
-        self.date = []
         self.days = None
+        self.date = []
         self.sumForeign = None
         self.sumING = None
         self.sumDealer = None
@@ -85,8 +85,8 @@ def LeadertoExcel(columns, buyin_list, sellout_list, save_file_name):
             item.code,
             item.name,
             item.diff,
-            len(item.date),
             item.days,
+            len(item.date),
             item.sumForeign,
             item.sumING,
             item.sumDealer,
@@ -109,8 +109,8 @@ def LeadertoExcel(columns, buyin_list, sellout_list, save_file_name):
             item.code,
             item.name,
             item.diff,
-            len(item.date),
             item.days,
+            len(item.date),
             item.sumForeign,
             item.sumING,
             item.sumDealer,
