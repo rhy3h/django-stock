@@ -44,14 +44,14 @@ class StockClass:
         self.capital = None
         self.industry = None
         self.status = None
+        self.close = None
+        self.changeRate = None
         self.five = None
         self.ten = None
         self.twenty = None
         self.sixty = None
         self.one_twenty = None
         self.two_forty = None
-        self.close = None
-        self.changeRate = None
         
     def __lt__(self, other):
         return self.diff > other.diff
@@ -112,7 +112,7 @@ def NameToID(name):
                 j += 1
             break
         i += 1
-    print(broker_id, branch_id)
+        
     return {'broker_id': broker_id, 'branch_id':  branch_id}
 
 def IDToName(broker, branch):
@@ -136,7 +136,7 @@ def IDToName(broker, branch):
     
     return {'branch_name': branch_name}
 
-def SaveList(stock_table, broker_group_Name, begin_date, end_date):
+def ListtoExcel(stock_table, save_file_name):
     positive_table = stock_table['positive']
     positive_list = []
     negative_table = stock_table['negative']
@@ -154,14 +154,14 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
             int(stock.code),
             stock.name,
             int(stock.diff),
-            stock.close,
-            stock.changeRate,
             stock.sumForeign,
             stock.sumING,
             stock.sumDealer,
             stock.capital,
             stock.industry,
             stock.status,
+            stock.close,
+            stock.changeRate,
             stock.five,
             stock.ten,
             stock.twenty,
@@ -183,14 +183,14 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
             int(stock.code),
             stock.name,
             int(stock.diff),
-            stock.close,
-            stock.changeRate,
             stock.sumForeign,
             stock.sumING,
             stock.sumDealer,
             stock.capital,
             stock.industry,
             stock.status,
+            stock.close,
+            stock.changeRate,
             stock.five,
             stock.ten,
             stock.twenty,
@@ -202,10 +202,10 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
         ]
         negative_list.append(temp)
         
-    colnames = ['代碼', '股票', '差額(仟元)', '收盤價', '漲跌幅(%)', '外資', '投信', '自營商', '股本', '產業', '產業地位', '5日(%)', '10日(%)', '20日(%)', '60日(%)', '120日(%)', '240日(%)', '買進', '賣出']
+    colnames = ['代碼', '股票', '差額(仟元)', '外資', '投信', '自營商', '股本', '產業', '產業地位', '收盤價', '漲跌幅(%)', '5日(%)', '10日(%)', '20日(%)', '60日(%)', '120日(%)', '240日(%)', '買進', '賣出']
     df_positive = pd.DataFrame(positive_list, columns = colnames)
     df_negative = pd.DataFrame(negative_list, columns = colnames)
-    writer = pd.ExcelWriter(f"djangoapp/stockapp/files/Save Files/{broker_group_Name} {begin_date} {end_date}.xlsx", engine='xlsxwriter')
+    writer = pd.ExcelWriter(f"djangoapp/stockapp/files/Save Files/{ save_file_name }.xlsx", engine='xlsxwriter')
     df_positive.to_excel(writer, sheet_name='買入', index=False)
     df_negative.to_excel(writer, sheet_name='賣出', index=False)
 
@@ -219,7 +219,7 @@ def SaveList(stock_table, broker_group_Name, begin_date, end_date):
     formatC = workbook.add_format({'num_format': '#,##'})
     
     cols = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
-    widths = [5.71, 7.29, 8.71, 10.14, 7.14, 7.14, 7.14, 7.71, 14.71, 54.71, 8.46, 8.46, 8.46, 8.46, 8.46, 8.46, 8.46, 8.43, 8.43]
+    widths = [5.71, 7.29, 7.14, 7.14, 7.14, 7.71, 14.71, 54.71, 8.71, 10.14, 8.46, 8.46, 8.46, 8.46, 8.46, 8.46, 8.46, 8.43, 8.43]
     i = 0
     while i < len(cols):
         worksheet_positive.set_column(f'{cols[i]}:{cols[i]}', widths[i], None)

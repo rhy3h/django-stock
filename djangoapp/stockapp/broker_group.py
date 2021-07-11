@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from stockapp import models
-from stockapp.crawler.fubon import NameToID, CrawlerList, SaveList
+from stockapp.crawler.fubon import NameToID, CrawlerList, ListtoExcel
 from stockapp.crawler import wantgoo
 
 from django.utils.encoding import escape_uri_path
@@ -112,15 +112,8 @@ def delete(request, group_id):
 @login_required
 def download(request, group_id):
     try:
-        User = request.user
-        broker_group = models.BrokerGroup.objects.get(
-            Owner = User,
-            id = group_id
-        )
-        begin_date = request.GET['begin_date']
-        end_date = request.GET['end_date']
-        filename = f'{broker_group.Name} {begin_date} {end_date}.xlsx'
-        with open('djangoapp/stockapp/files/Save Files/' + filename, 'rb') as model_excel:
+        filename = f"{ request.GET['filename'] }.xlsx"
+        with open(f'djangoapp/stockapp/files/Save Files/{ filename }', 'rb') as model_excel:
             result = model_excel.read()
         response = HttpResponse(result, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename={}'.format(escape_uri_path(filename))
@@ -153,6 +146,28 @@ def index(request, group_id):
     begin_date = today
     end_date = today
     
+    columns = [
+        '代碼',
+        '股票',
+        '差額(仟元)',
+        '外資',
+        '投信',
+        '自營商',
+        '股本',
+        '產業',
+        '產業地位',
+        '收盤價',
+        '漲跌幅(%)',
+        '5日(%)',
+        '10日(%)',
+        '20日(%)',
+        '60日(%)',
+        '120日(%)',
+        '240日(%)',
+        '買進',
+        '賣出',
+    ]
+    
     if request.POST.get('search'):
         begin_date = request.POST.get('begin-date')
         begin_datatime = datetime.strptime(begin_date, "%Y-%m-%d")
@@ -171,6 +186,7 @@ def index(request, group_id):
         for broker in broker_list:
             broker_branch.append(ClsBroker(broker.Broker, broker.Branch))
         stock_table = CrawlerList(broker_branch, begin_date, end_date)
-        SaveList(stock_table, broker_group.Name, begin_date, end_date)
+        save_file_name = f"{broker_group.Name} {begin_date} {end_date}"
+        ListtoExcel(stock_table, save_file_name)
         
     return render(request, 'broker-group.html', locals())

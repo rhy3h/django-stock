@@ -17,15 +17,15 @@ urlpatterns = [
     path('broker-group/<int:group_id>/delete', broker_group.delete),
     path('broker-group/<int:group_id>/upload', broker_group.upload),
     path('broker-group/<int:group_id>/sync/', broker_group.sync),
-    path('broker-group/<int:group_id>/download', broker_group.download),
+    path('broker-group/<int:group_id>/download/', broker_group.download),
 
     path('leaderboard/', leaderboard.index),
-    
+    path('leaderboard/download', leaderboard.download),
+
     path('stock-group/', stock_group.base),
     path('stock-group/create/', stock_group.create),
     path('stock-group/<int:group_id>/', stock_group.index),
     path('stock-group/<int:group_id>/add', stock_group.add),
     path('stock-group/<int:group_id>/edit', stock_group.edit),
     path('stock-group/<int:group_id>/delete', stock_group.delete),
-
 ]
