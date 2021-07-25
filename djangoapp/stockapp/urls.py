@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.conf.urls import url
 
-from stockapp import broker_group, leaderboard, stock_group
+from stockapp import broker_group, leaderboard, stock_group, stock
 
 from stockapp.crawler import wantgoo
 from stockapp import leaderboard
@@ -28,4 +28,12 @@ urlpatterns = [
     path('stock-group/<int:group_id>/add', stock_group.add),
     path('stock-group/<int:group_id>/edit', stock_group.edit),
     path('stock-group/<int:group_id>/delete', stock_group.delete),
+
+    path('stock-group/test', stock_group.test),
+
+    path('stock/', stock.base),
+    path('stock/<int:code>/', stock.index),
+    path('stock/<int:code>/add', stock.add),
+    path('stock/<int:code>/delete', stock.delete),
+    path('stock/<int:code>/backtesting', stock.backtesting),
 ]

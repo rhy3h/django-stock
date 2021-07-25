@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block mystyle %}
+<style>
+	/*the container must be positioned relative:*/
+	.autocomplete {
+		position: relative;
+		display: inline-block;
+	}
+	.autocomplete-items {
+		position: absolute;
+		border: 0px solid #d4d4d4;
+		border-bottom: none;
+		border-top: none;
+		z-index: 99;
+		/*position the autocomplete items to be the same width as the container:*/
+		top: 100%;
+		left: 0%;
+		right: 0;
+		width: 100%;
+		margin: 5px 0 0px;
+	}
+	.autocomplete-items div {
+		padding: 10px;
+		cursor: pointer;
+		background-color: #fff; 
+		border-bottom: 1px solid #d4d4d4; 
+	}
+	/*when hovering an item:*/
+	.autocomplete-items div:hover {
+		background-color: #e9e9e9; 
+	}
+	/*when navigating through the items using the arrow keys:*/
+	.autocomplete-active {
+		background-color: DodgerBlue !important; 
+		color: #ffffff; 
+	}
+</style>
+{% endblock mystyle %}
+
+{% block sidebar %}
+
+<div class="sidebar">
+	<!-- Sidebar user (optional) -->
+	<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+		<div class="image">
+			<img src="{% static 'img/wallet.png' %}" alt="" class="brand-image" style="opacity: .8">
+		</div>
+		<div class="info">
+			<a class="d-block">{{ User }}</a>
+		</div>
+	</div>
+	<div class="form-inline">
+		<div class="input-group">
+			<input class="form-control form-control-sidebar" id="stock-input" name="stock-input" type="search" placeholder="搜尋股票" aria-label="Search">
+			<div class="">
+				<button class="btn btn-sidebar">
+				<i class="fas fa-search fa-fw"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+	<!-- Sidebar Menu -->
+	<nav class="mt-2">
+		<ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+			{% for stock in stock_list %}
+			<li class="nav-item">
+				<a href="/stock/{{ stock.Code }}" class="nav-link">
+					<i class="far fa-circle nav-icon"></i>
+					<p>{{ stock.Code }} {{ stock.Name }}</p>
+				</a>
+			</li>
+			{% endfor %}
+		</ul>
+	</nav>
+	<!-- /.sidebar-menu -->
+</div>
+{% endblock sidebar %}
+
+<!-- /.sidebar -->
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+	<!-- Content Header (Page header) -->
+	<div class="content-header">
+		<div class="container-fluid">
+			{% if code %}
+			<div class="row py-3 border-bottom">
+				<div class="col-sm-4 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+					<h1 class="m-0">
+						{{ full_code_name }}
+						<a class="btn btn-outline-primary" href="add">
+							新增
+						</a>
+						<a class="btn btn-outline-danger" href="delete">
+							刪除
+						</a>
+					</h1>
+				</div><!-- /.col -->
+				<div class="col-sm-4 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
+					<a class="btn btn-outline-danger" href="backtesting">
+						回測
+					</a>
+				</div><!-- /.col -->
+				<div class="col-sm-4 d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center">
+					<form method="POST" action="">
+						{% csrf_token %}
+						<div class="row">
+							<div class="col-sm-5 col-12">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
+								<input class="form-control" id="begin-date" name="begin-date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" onchange="sync_end_date()">
+							</div>
+							<div class="col-sm-5 col-12">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
+								<input class="form-control" id="end-date" name="end-date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
+							</div>
+							<div class="col-sm-2 col-12">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
+								<input class="btn btn-outline-primary" type="submit" value="搜尋" name="search">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div><!-- /.row -->
+			
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row pt-3 ">
+						<!-- <iframe src="http://www.fooish.com/" width="100%" height="600px">
+							你的瀏覽器不支援 iframe
+						</iframe> -->
+					</div>
+					<div class="row pt-3 ">
+						<div class="col-lg-6" id="positive">
+						<div class="card">
+							<div class="card-header text-primary">
+							買入
+							</div>
+							<div class="card-body">
+								<table data-excel-name="買入" class="table table-bordered table-striped" id="positive-table" style="width:100%">
+									<thead>
+										<tr>
+											<th>券商名稱</th>
+											<th>買入</th>
+											<th>賣出</th>
+											<th>差額</th>
+											<th>百分比</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for broker in broker_table.positive %}
+										<tr>
+											<td>{{ broker.name }}</td>
+											<td>{{ broker.buyin | intcomma }}</td>
+											<td>{{ broker.sellout | intcomma }}</td>
+											<td>{{ broker.diff | intcomma }}</td>
+											<td>{{ broker.percent }}</td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>		
+						<!-- /.card -->
+						</div>
+						<!-- /.col-md-6 -->
+				
+						<div class="col-lg-6" id="negative">
+							<div class="card">
+								<div class="card-header text-primary">
+									賣出
+								</div>
+								<div class="card-body">
+									<table data-excel-name="賣出" class="table table-bordered table-striped" id="negative-table" style="width:100%">
+										<thead>
+											<tr>
+												<th>券商名稱</th>
+												<th>買入</th>
+												<th>賣出</th>
+												<th>差額</th>
+												<th>百分比</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for broker in broker_table.negative %}
+											<tr>
+												<td>{{ broker.name }}</td>
+												<td>{{ broker.buyin | intcomma }}</td>
+												<td>{{ broker.sellout | intcomma }}</td>
+												<td>{{ broker.diff | intcomma }}</td>
+												<td>{{ broker.percent }}</td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<!-- /.card -->
+						</div>
+						<!-- /.col-md-6 -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
+			</div>
+			{% endif %}
+		</div><!-- /.container-fluid -->
+	</div>
+	<!-- /.content-header -->
+	
+	<div class="content"></div>
+		<div class="container-fluid">
+			<div class="row">
+			</div>
+			<!-- /.row -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+</div>
+<!-- /.content-wrapper -->
+{% endblock content %}
+
+
+{% block script %}
+<script>
+	function sync_end_date(){
+		document.getElementById("end-date").value = document.getElementById("begin-date").value;
+	}
+	
+	$('#sidebar').find('a').each(function () {
+		if (this.href == document.location.href || document.location.href.search(this.href) >= 0) {
+			$(this).addClass('active');
+		}
+	});
+	function autocomplete(inp, arr) {
+			/*the autocomplete function takes two arguments,
+			the text field element and an array of possible autocompleted values:*/
+			var currentFocus;
+			/*execute a function when someone writes in the text field:*/
+			inp.addEventListener("input", function(e) {
+				var a, b, i, val = this.value;
+				/*close any already open lists of autocompleted values*/
+				closeAllLists();
+				if (!val) {
+					return false;
+				}
+				currentFocus = -1;
+				/*create a DIV element that will contain the items (values):*/
+				a = document.createElement("DIV");
+				a.setAttribute("id", this.id + "autocomplete-list");
+				a.setAttribute("class", "autocomplete-items");
+				a.setAttribute("style", "height:300px;overflow-y:auto");
+				
+				/*append the DIV element as a child of the autocomplete container:*/
+				this.parentNode.appendChild(a);
+				/*for each item in the array...*/
+				for (i = 0; i < arr.length; i++) {
+					/*check if the item starts with the same letters as the text field value:*/
+                    if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                        /*create a DIV element for each matching element:*/
+                        b = document.createElement("DIV");
+                        /*make the matching letters bold:*/
+                        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                        b.innerHTML += arr[i].substr(val.length);
+                        /*insert a input field that will hold the current array item's value:*/
+                        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                        /*execute a function when someone clicks on the item value (DIV element):*/
+                        b.addEventListener("click", function (e) {
+                            /*insert the value for the autocomplete text field:*/
+                            inp.value = this.getElementsByTagName("input")[0].value;
+                            /*close the list of autocompleted values,
+                            (or any other open lists of autocompleted values:*/
+                            closeAllLists();
+							window.location.href = "/stock/" + inp.value.substr(0, 4);
+                        });
+						
+                        a.appendChild(b);
+                    }
+				}
+			});
+			/*execute a function presses a key on the keyboard:*/
+			inp.addEventListener("keydown", function(e) {
+				var x = document.getElementById(this.id + "autocomplete-list");
+				if (x)
+					x = x.getElementsByTagName("div");
+				if (e.keyCode == 40) {
+					/*If the arrow DOWN key is pressed,
+					increase the currentFocus variable:*/
+					currentFocus++;
+					/*and and make the current item more visible:*/
+					addActive(x);
+				} else if (e.keyCode == 38) { //up
+					/*If the arrow UP key is pressed,
+					decrease the currentFocus variable:*/
+					currentFocus--;
+					/*and and make the current item more visible:*/
+					addActive(x);
+				} else if (e.keyCode == 13) {
+					/*If the ENTER key is pressed, prevent the form from being submitted,*/
+					e.preventDefault();
+					if (currentFocus > -1) {
+						/*and simulate a click on the "active" item:*/
+						if (x) {
+							x[currentFocus].click();
+						}
+					}
+				}
+			});
+			function addActive(x) {
+				/*a function to classify an item as "active":*/
+				if (!x) return false;
+				/*start by removing the "active" class on all items:*/
+				removeActive(x);
+				if (currentFocus >= x.length) currentFocus = 0;
+				if (currentFocus < 0) currentFocus = (x.length - 1);
+				/*add class "autocomplete-active":*/
+				x[currentFocus].classList.add("autocomplete-active");
+			}
+			function removeActive(x) {
+				/*a function to remove the "active" class from all autocomplete items:*/
+				for (var i = 0; i < x.length; i++) {
+					x[i].classList.remove("autocomplete-active");
+				}
+			}
+			function closeAllLists(elmnt) {
+				/*close all autocomplete lists in the document,
+				except the one passed as an argument:*/
+				var x = document.getElementsByClassName("autocomplete-items");
+				for (var i = 0; i < x.length; i++) {
+					if (elmnt != x[i] && elmnt != inp) {
+						x[i].parentNode.removeChild(x[i]);
+					}
+				}
+			}
+			/*execute a function when someone clicks in the document:*/
+			document.addEventListener("click", function (e) {
+				closeAllLists(e.target);
+			});
+		}
+		
+		/*An array containing all the country names in the world:*/
+		var stock_list = {{ default_stock_list|safe }};
+		/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+		autocomplete(document.getElementById("stock-input"), stock_list);
+</script>
+{% endblock script %}

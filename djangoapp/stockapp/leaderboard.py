@@ -189,6 +189,7 @@ def index(request):
     columns = ['代碼', '股票', '差額(仟元)', '主力買超', '出現天數', '外資', '投信', '自營商', '股本', '產業', '產業地位','收盤價','漲跌幅(%)','5日(%)','10日(%)','20日(%)','60日(%)','120日(%)','240日(%)']
     
     if request.method == "POST":
+        search = True
         for file in request.FILES.getlist('uploadfiles'):
             file_date = file.name.split(' ')[-1][:-5]
             dates.append(file_date)

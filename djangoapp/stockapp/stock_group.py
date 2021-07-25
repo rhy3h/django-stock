@@ -85,3 +85,37 @@ def delete(request, group_id):
     stock_group_list.delete()
 
     return redirect('/stock-group/')
+
+from backtesting import Backtest, Strategy
+from backtesting.lib import crossover
+
+from backtesting.test import SMA
+
+import backtesting
+
+class SmaCross(Strategy):
+    def init(self):
+        close = self.data.Close
+        self.sma1 = self.I(SMA, close, 5)
+        self.sma2 = self.I(SMA, close, 10)
+    def next(self):
+        if crossover(self.sma1, self.sma2):
+            self.buy()
+        elif crossover(self.sma2, self.sma1):
+            self.sell()
+
+def test(request):
+    backtesting.set_bokeh_output(notebook=False)
+    df = pd.read_csv('djangoapp/stockapp/files/historical-daily-candlesticks/2330.csv')
+    df.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'QuoteVolume']
+    df['Date'] = pd.to_datetime(df['Date'], unit='s')
+    df.set_index('Date', inplace=True)
+    
+    bt = Backtest(df, SmaCross,
+                cash=10000, commission=.002,
+                exclusive_orders=True)
+
+    output = bt.run()
+    bt.plot()
+
+    return redirect('/stock-group/')

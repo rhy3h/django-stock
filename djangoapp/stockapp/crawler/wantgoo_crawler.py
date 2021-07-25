@@ -43,7 +43,7 @@ def crawler_historical_daily_candlesticks(historical_daily_candlesticks_data, co
 
     df = df.drop(columns=['tradeDate'])
     df['time'] = df['time'].add(28800000)
-    df['time'] = pd.to_datetime(df['time'], unit='ms')
+    df['time'] = df['time'].floordiv(1000)    
     
     historical_daily_candlesticks_data.append({
         'code': code,

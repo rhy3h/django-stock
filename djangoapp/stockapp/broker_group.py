@@ -168,7 +168,8 @@ def index(request, group_id):
         '賣出',
     ]
     
-    if request.POST.get('search'):
+    if request.method == "POST":
+        search = True
         begin_date = request.POST.get('begin-date')
         begin_datatime = datetime.strptime(begin_date, "%Y-%m-%d")
         end_date = request.POST.get('end-date')

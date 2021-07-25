@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class StockModel(models.Model):
+    Owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    Code = models.TextField(blank=False)
+    Name = models.TextField(blank=False)
+
 class BrokerGroup(models.Model):
     Owner = models.ForeignKey(User, on_delete=models.CASCADE)
     Name = models.TextField(blank=False)
