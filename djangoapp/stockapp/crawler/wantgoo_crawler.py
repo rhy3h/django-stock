@@ -32,7 +32,8 @@ def crawler_institutional_investors(institutional_investors_data, code):
 # 趨勢分析
 def crawler_historical_daily_candlesticks(historical_daily_candlesticks_data, code, today_timestamp):
     headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36',
+        'f-none-match': 'W/"6065B067AEAD258E41F585B1793F254A"'
     }
 
     url = f"https://www.wantgoo.com/investrue/{code}/historical-daily-candlesticks?before={today_timestamp}&top=240"
