@@ -12,3 +12,4 @@ tables
 pyprobar
 xlsxwriter
 bokeh
+Backtesting

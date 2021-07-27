@@ -28,8 +28,7 @@ urlpatterns = [
     path('stock-group/<int:group_id>/add', stock_group.add),
     path('stock-group/<int:group_id>/edit', stock_group.edit),
     path('stock-group/<int:group_id>/delete', stock_group.delete),
-
-    path('stock-group/test', stock_group.test),
+    path('stock-group/<int:group_id>/delete/<int:stock_item_id>', stock_group.delete_item),
 
     path('stock/', stock.base),
     path('stock/<int:code>/', stock.index),

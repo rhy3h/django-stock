@@ -100,19 +100,7 @@
 				</div><!-- /.col -->
 				
 				<div class="col-sm-4 d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center">
-					<form method="POST" action="">
-						{% csrf_token %}
-						<div class="row">
-							<div class="col-sm-10 col-12">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">檔案</div>
-								<input class="form-control" type="file" accept=".xlsx" id="uploadfiles" name="uploadfiles" multiple>
-							</div>
-							<div class="col-sm-2 col-12">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
-								<input class="btn btn-outline-primary" type="submit" value="搜尋" name="search">
-							</div>
-						</div>
-					</form>
+					
 				</div><!-- /.col -->
 			</div><!-- /.row -->
 			<h3 class="h3 pt-3">股票清單
@@ -124,6 +112,11 @@
 				{% for item in stock_group_item_list %}
 				<h6 class="fs-4 col-xxl-2 col-xl-3 col-lg-4 col-sm-6 d-flex justify-content-between align-items-center">
 					<span class="fs-5">{{ item.Code }} {{ item.Name }}</span>
+					<span class="fs-5">
+						<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-stock">
+						刪除
+						</a>
+					</span>
 				</h6>
 				{% endfor %}
 			</div>
@@ -133,7 +126,33 @@
 	{% endif %}
 	<div class="content">
 		<div class="container-fluid">
-			<div class="row">
+			<div class="row pt-3 ">
+				<div class="col-lg-12" id="positive">
+					<div class="card">
+						<div class="card-header text-primary">
+						股票
+						</div>
+						<div class="card-body">
+							<table class="table table-bordered table-striped" id="positive-table" style="width:100%">
+								<thead>
+								<tr>
+									{% for col in columns %}
+									<th>123</th>
+									{% endfor %}
+								</tr>
+								</thead>
+								<tbody>
+								{% for stock in stock_table.positive %}
+								<tr>
+								</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>		
+					<!-- /.card -->
+				</div>
+				<!-- /.col-md-6 -->
 			</div>
 			<!-- /.row -->
 		</div>
@@ -179,6 +198,26 @@
 			</div>
 			<div class="modal-body">
 				確認刪除 <font class="text-danger">{{ stock_group.Name }}</font> 股票群組？
+			</div>
+			<div class="modal-footer">
+				<form class="needs-validation" method="POST" action="delete">
+					{% csrf_token %}
+					<button class="btn btn-outline-danger" type="submit" id="new-broker-group-submit">刪除</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="delete-stock" tabindex="-1" aria-labelledby="delete-stock-group" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">刪除股票</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				確認刪除股票 <font class="text-danger"></font> ？
 			</div>
 			<div class="modal-footer">
 				<form class="needs-validation" method="POST" action="delete">
@@ -364,7 +403,7 @@
 		}
 		
 		/*An array containing all the country names in the world:*/
-		var stock_list = {{ default_stock_list|safe }};
+		var stock_list = {{ default_stock_list | safe }};
 		/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
 		autocomplete(document.getElementById("stock-input"), stock_list);
 </script>

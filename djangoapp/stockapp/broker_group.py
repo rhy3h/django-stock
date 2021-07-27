@@ -93,7 +93,7 @@ def sync(request, group_id):
     tomorrow = date.today() + timedelta(days = 1)
     tomorrow_string = tomorrow.strftime("%Y-%m-%d")
     tomorrow_timestamp = int(time.mktime(datetime.strptime(tomorrow_string, "%Y-%m-%d").timetuple()) * 1000)
-    wantgoo.sync_historical_daily_candlesticks(tomorrow_timestamp)
+    # wantgoo.sync_historical_daily_candlesticks(tomorrow_timestamp)
     
     return JsonResponse([], safe=False)
 

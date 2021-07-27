@@ -5,13 +5,14 @@ import pandas as pd
 # 三大法人買賣超
 def crawler_institutional_investors(institutional_investors_data, code):
     headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36',
+        'f-none-match': 'W/"0E388198B4C3285D182724181C442790"'
     }
 
     url = f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90"
     resource_page = requests.get(url, headers = headers)
     resource_page.encoding = 'utf-8'
-    
+
     data = resource_page.json()
     df = json_normalize(data)
     
