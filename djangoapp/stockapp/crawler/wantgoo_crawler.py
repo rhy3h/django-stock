@@ -8,49 +8,52 @@ def crawler_institutional_investors(institutional_investors_data, code):
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36',
         'f-none-match': 'W/"0E388198B4C3285D182724181C442790"'
     }
-
-    url = f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
-
-    data = resource_page.json()
-    df = json_normalize(data)
+    # url = f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90"
+    url = f"https://www.wantgoo.com/stock/{code}/three-trend-for-30days"
+    try:
+        resource_page = requests.get(url, headers = headers)
+        resource_page.encoding = 'utf-8'
+        
+        data = resource_page.json()
+        df = json_normalize(data)
+        
+        df['date'] = df['date'].str[:10]
+        df = df.rename(columns={'foreign': 'sumForeign', 'trust': 'sumING', 'dealer': 'sumDealer'})
+        
+        institutional_investors_data.append({
+            'code': code,
+            'df': df
+        })
+    except:
+        pass
     
-    df['date'] = df['date'].str[:10]
-    df['sumForeign'] = df['sumForeignWithDealer'] + df['sumForeignNoDealer']
-    df = df.drop(columns=['sumForeignWithDealer', 'sumForeignNoDealer'])
-    df['sumDealer'] = df['sumDealerBySelf'] + df['sumDealerHedging']
-    df = df.drop(columns=['sumDealerBySelf', 'sumDealerHedging'])
-    df = df.drop(columns=['investrueId', 'foreignHolding', 'ingHolding', 'dealerHolding', 'foreignHoldingRate', 'sumHoldingRate'])
-
-    institutional_investors_data.append({
-        'code': code,
-        'df': df
-    })
     return True
 
 # 趨勢分析
 def crawler_historical_daily_candlesticks(historical_daily_candlesticks_data, code, today_timestamp):
     headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36',
-        'f-none-match': 'W/"6065B067AEAD258E41F585B1793F254A"'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36',
     }
-
     url = f"https://www.wantgoo.com/investrue/{code}/historical-daily-candlesticks?before={today_timestamp}&top=240"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
     
-    data = resource_page.json()
-    df = json_normalize(data)
+    try:
+        resource_page = requests.get(url, headers = headers)
+        resource_page.encoding = 'utf-8'
+    
+        data = resource_page.json()
+        df = json_normalize(data)
 
-    df = df.drop(columns=['tradeDate'])
-    df['time'] = df['time'].add(28800000)
-    df['time'] = df['time'].floordiv(1000)    
-    
-    historical_daily_candlesticks_data.append({
-        'code': code,
-        'df': df
-    })
+        df = df.drop(columns=['tradeDate'])
+        df['time'] = df['time'].add(28800000)
+        df['time'] = df['time'].floordiv(1000)    
+        
+        historical_daily_candlesticks_data.append({
+            'code': code,
+            'df': df
+        })
+    except:
+        pass
+
     return True
 
 # 收盤價，當日漲跌幅
