@@ -1,117 +1,93 @@
-import requests
 from pandas import json_normalize
 import pandas as pd
+from bs4 import BeautifulSoup
+import json
+from datetime import date, datetime, timedelta
+import time
 
-# 三大法人買賣超
-def crawler_institutional_investors(institutional_investors_data, code):
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36',
-        'f-none-match': 'W/"0E388198B4C3285D182724181C442790"'
-    }
-    # url = f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90"
-    url = f"https://www.wantgoo.com/stock/{code}/three-trend-for-30days"
-    try:
-        resource_page = requests.get(url, headers = headers)
-        resource_page.encoding = 'utf-8'
-        
-        data = resource_page.json()
-        df = json_normalize(data)
-        
-        df['date'] = df['date'].str[:10]
-        df = df.rename(columns={'foreign': 'sumForeign', 'trust': 'sumING', 'dealer': 'sumDealer'})
-        
-        institutional_investors_data.append({
-            'code': code,
-            'df': df
-        })
-    except:
-        pass
-    
-    return True
+def sync_institutional_investors(stock_list, driver):
+    institutional_investors_data = []
 
-# 趨勢分析
-def crawler_historical_daily_candlesticks(historical_daily_candlesticks_data, code, today_timestamp):
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36',
-    }
-    url = f"https://www.wantgoo.com/investrue/{code}/historical-daily-candlesticks?before={today_timestamp}&top=240"
-    
-    try:
-        resource_page = requests.get(url, headers = headers)
-        resource_page.encoding = 'utf-8'
-    
-        data = resource_page.json()
-        df = json_normalize(data)
+    i = 0
+    while i < len(stock_list):
+        code = stock_list[i]
+        try:
+            driver.get(f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90")
+            soup = BeautifulSoup(driver.page_source, "html.parser")
+            
+            dict_from_json = json.loads(soup.find("body").text)
+            df = json_normalize(dict_from_json)
 
-        df = df.drop(columns=['tradeDate'])
-        df['time'] = df['time'].add(28800000)
-        df['time'] = df['time'].floordiv(1000)    
-        
-        historical_daily_candlesticks_data.append({
-            'code': code,
-            'df': df
-        })
-    except:
-        pass
+            df['date'] = df['date'].str[:10]
+            df['sumForeign'] = df['sumForeignWithDealer'] + df['sumForeignNoDealer']
+            df = df.drop(columns=['sumForeignWithDealer', 'sumForeignNoDealer'])
+            df['sumDealer'] = df['sumDealerBySelf'] + df['sumDealerHedging']
+            df = df.drop(columns=['sumDealerBySelf', 'sumDealerHedging'])
+            df = df.drop(columns=['investrueId', 'foreignHolding', 'ingHolding', 'dealerHolding', 'foreignHoldingRate', 'sumHoldingRate'])
+
+            institutional_investors_data.append({
+                'code': code,
+                'df': df
+            })
+        except:
+            driver.get(f"https://www.wantgoo.com/stock/{code}")
+            i -= 1
+        i += 1
+
+    driver.quit()
+
+    with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5',  mode='w') as store:
+        i = 0
+        while i < len(institutional_investors_data):
+            code = institutional_investors_data[i]['code']
+            code_name = f'code{code}'
+            institutional_investors_data[i]['df'].to_csv(f'djangoapp/stockapp/files/institutional-investors/{code}.csv', index = 0)
+            store.append(code_name, institutional_investors_data[i]['df'],  data_columns=['date'], format='table')
+            i += 1
 
     return True
 
-# 收盤價，當日漲跌幅
-def crawler_daily_candlestick(code):
-    data = []
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    }
+def sync_historical_daily_candlesticks(stock_list, driver):
+    tomorrow = date.today() + timedelta(days = 1)
+    tomorrow_string = tomorrow.strftime("%Y-%m-%d")
+    tomorrow_timestamp = int(time.mktime(datetime.strptime(tomorrow_string, "%Y-%m-%d").timetuple()) * 1000)
     
-    url = f"https://www.wantgoo.com/investrue/{code}/daily-candlestick"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
-    
-    data = resource_page.json()
-    
-    return data
+    historical_daily_candlesticks_data = []
 
-# 每股盈餘
-def crawler_eps_data(code):
-    data = []
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    }
-    
-    url = f"https://www.wantgoo.com/stock/{code}/financial-statements/eps-data"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
-    
-    data = resource_page.json()
-    
-    return data
+    i = 0
+    while i < len(stock_list):
+        code = stock_list[i]
+        try:
+            driver.get(f"https://www.wantgoo.com/investrue/{code}/historical-daily-candlesticks?before={tomorrow_timestamp}&top=240")
+            soup = BeautifulSoup(driver.page_source, "html.parser")
 
-# 每月營收
-def crawler_monthly_revenue_data(code):
-    data = []
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    }
-    
-    url = f"https://www.wantgoo.com/stock/{code}/financial-statements/monthly-revenue-data"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
-    
-    data = resource_page.json()
-    
-    return data
+            dict_from_json = json.loads(soup.find("body").text)
+            df = json_normalize(dict_from_json)
 
-# 本益比
-def crawler_price_earning_ratio(code):
-    data = []
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
-    }
+            df = df.drop(columns=['tradeDate'])
+            df['time'] = df['time'].add(28800000)
+            df['time'] = df['time'].floordiv(1000)
+
+            historical_daily_candlesticks_data.append({
+                'code': code,
+                'df': df
+            })
+
+        except:
+            driver.get(f"https://www.wantgoo.com/stock/{code}")
+            i -= 1
+        
+        i += 1
     
-    url = f"https://www.wantgoo.com/stock/{code}/enterprise-value/data"
-    resource_page = requests.get(url, headers = headers)
-    resource_page.encoding = 'utf-8'
+    driver.quit()
     
-    data = resource_page.json()
-    
-    return data
+    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5',  mode='w') as store:
+        i = 0
+        while i < len(historical_daily_candlesticks_data):
+            code = historical_daily_candlesticks_data[i]['code']
+            code_name = f'code{code}'
+            historical_daily_candlesticks_data[i]['df'].to_csv(f'djangoapp/stockapp/files/historical-daily-candlesticks/{code}.csv', index = 0)
+            store.append(code_name, historical_daily_candlesticks_data[i]['df'],  data_columns=['date'], format='table')
+            i += 1
+        
+    return True

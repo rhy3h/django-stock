@@ -11,5 +11,6 @@ openpyxl
 tables
 pyprobar
 xlsxwriter
-bokeh
 Backtesting
+chromedriver-autoinstaller
+selenium

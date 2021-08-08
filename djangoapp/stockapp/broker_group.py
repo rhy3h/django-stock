@@ -86,14 +86,7 @@ def upload(request, group_id):
 @login_required
 def sync(request, group_id):
     
-    print("三大法人買賣超")
-    wantgoo.sync_institutional_investors()
-    
-    print("趨勢分析")
-    tomorrow = date.today() + timedelta(days = 1)
-    tomorrow_string = tomorrow.strftime("%Y-%m-%d")
-    tomorrow_timestamp = int(time.mktime(datetime.strptime(tomorrow_string, "%Y-%m-%d").timetuple()) * 1000)
-    wantgoo.sync_historical_daily_candlesticks(tomorrow_timestamp)
+    wantgoo.sync()
     
     return JsonResponse([], safe=False)
 

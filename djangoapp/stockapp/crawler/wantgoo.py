@@ -10,6 +10,12 @@ from stockapp.tools import progress_bar
 
 from stockapp.crawler import wantgoo_crawler
 
+import chromedriver_autoinstaller
+from selenium import webdriver  
+from bs4 import BeautifulSoup
+import json
+from pandas import json_normalize
+
 def CountContinuous(df):
     pd.options.mode.chained_assignment = None
 
@@ -71,90 +77,37 @@ def count_read_institutional_investors(request, code, end_date):
         pass
     
     return JsonResponse(data, safe=False)
+import winsound
 
-def sync_institutional_investors():
+def sync():
     stock_list = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')['代碼'].values.tolist()
+
+    chromedriver_autoinstaller.install(cwd=True)
+
+    chrome_options = webdriver.ChromeOptions() 
     
-    start = time.time()
+    driver_institutional_investors = webdriver.Chrome(options=chrome_options)
+    driver_institutional_investors.minimize_window()
+    driver_institutional_investors.implicitly_wait(5)
+
+    driver_historical_daily_candlesticks = webdriver.Chrome(options=chrome_options)
+    driver_historical_daily_candlesticks.minimize_window()
+    driver_historical_daily_candlesticks.implicitly_wait(5)
     
-    institutional_investors_data = []
-    threads_number = 50
-    i = 0
-    while i < len(stock_list):
-        threads = []
-        j = 0
-        while j < threads_number and i + j < len(stock_list):
-            progress_bar("爬蟲中: ", i + j + 1, len(stock_list))
-            threads.append(threading.Thread(target = wantgoo_crawler.crawler_institutional_investors, args = (institutional_investors_data, stock_list[i + j], )))
-            threads[j].start()
-            j += 1
-        
-        for j in range(len(threads)):
-            threads[j].join()
-        
-        i += threads_number
-    end = time.time()
-    min = int((end - start) / 60)
-    sec = int((end - start) % 60)
-    print(f"\n爬蟲時間: {min}分:{sec}秒")
+    threads = []
 
-    start = time.time()
-    with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5',  mode='w') as store:
-        i = 0
-        while i < len(institutional_investors_data):
-            code = institutional_investors_data[i]['code']
-            code_name = f'code{code}'
-            institutional_investors_data[i]['df'].to_csv(f'djangoapp/stockapp/files/institutional-investors/{code}.csv', index = 0)
-            store.append(code_name, institutional_investors_data[i]['df'],  data_columns=['date'], format='table')
-            
-            progress_bar("存檔中: ", i + 1, len(stock_list))
-            i += 1
-
-    end = time.time()
-    print(f"\n存檔時間: {int(end - start)}秒")
-
-    return True
-
-def sync_historical_daily_candlesticks(today_timestamp):
-    stock_list = pd.read_excel('djangoapp/stockapp/files/上市、上櫃(股本、產業、產業地位).xlsx')['代碼'].values.tolist()
+    print("三大法人買賣超")
+    threads.append(threading.Thread(target =  wantgoo_crawler.sync_institutional_investors, args = (stock_list, driver_institutional_investors, )))
+    threads[0].start()
     
-    start = time.time()
+    print("趨勢分析")
+    threads.append(threading.Thread(target =  wantgoo_crawler.sync_historical_daily_candlesticks, args = (stock_list, driver_historical_daily_candlesticks, )))
+    threads[1].start()
     
-    historical_daily_candlesticks_data = []
-    threads_number = 50
-    i = 0
-    while i < len(stock_list):
-        threads = []
-        j = 0
-        while j < threads_number and i + j < len(stock_list):
-            progress_bar("爬蟲中: ", i + j + 1, len(stock_list))
-            threads.append(threading.Thread(target = wantgoo_crawler.crawler_historical_daily_candlesticks, args = (historical_daily_candlesticks_data, stock_list[i + j], today_timestamp)))
-            threads[j].start()
-            j += 1
-        
-        for j in range(len(threads)):
-            threads[j].join()
-        
-        i += threads_number
+    for i in range(len(threads)):
+        threads[i].join()
 
-    end = time.time()
-    min = int((end - start) / 60)
-    sec = int((end - start) % 60)
-    print(f"\n爬蟲時間: {min}分:{sec}秒")
-
-    start = time.time()
-    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5',  mode='w') as store:
-        i = 0
-        while i < len(historical_daily_candlesticks_data):
-            code = historical_daily_candlesticks_data[i]['code']
-            code_name = f'code{code}'
-            historical_daily_candlesticks_data[i]['df'].to_csv(f'djangoapp/stockapp/files/historical-daily-candlesticks/{code}.csv', index = 0)
-            store.append(code_name, historical_daily_candlesticks_data[i]['df'],  data_columns=['date'], format='table')
-            
-            progress_bar("存檔中: ", i + 1, len(stock_list))
-            i += 1
-
-    end = time.time()
-    print(f"\n存檔時間: {int(end - start)}秒")
+    winsound.Beep(500,500)
+    print("同步完成")
 
     return True
