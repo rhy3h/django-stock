@@ -12,7 +12,8 @@ def sync_institutional_investors(stock_list, driver):
     while i < len(stock_list):
         code = stock_list[i]
         try:
-            driver.get(f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=90")
+            driver.get(f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend")
+            driver.get(f"https://www.wantgoo.com/stock/{code}/institutional-investors/trend-data?topdays=20")
             soup = BeautifulSoup(driver.page_source, "html.parser")
             
             dict_from_json = json.loads(soup.find("body").text)
@@ -30,7 +31,6 @@ def sync_institutional_investors(stock_list, driver):
                 'df': df
             })
         except:
-            driver.get(f"https://www.wantgoo.com/stock/{code}")
             i -= 1
         i += 1
 
@@ -58,6 +58,7 @@ def sync_historical_daily_candlesticks(stock_list, driver):
     while i < len(stock_list):
         code = stock_list[i]
         try:
+            driver.get(f"https://www.wantgoo.com/stock/{code}/technical-chart")
             driver.get(f"https://www.wantgoo.com/investrue/{code}/historical-daily-candlesticks?before={tomorrow_timestamp}&top=240")
             soup = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -74,7 +75,6 @@ def sync_historical_daily_candlesticks(stock_list, driver):
             })
 
         except:
-            driver.get(f"https://www.wantgoo.com/stock/{code}")
             i -= 1
         
         i += 1
