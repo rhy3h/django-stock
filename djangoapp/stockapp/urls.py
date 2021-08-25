@@ -3,12 +3,12 @@ from django.conf.urls import url
 
 from stockapp import broker_group, leaderboard, stock_group, stock
 
-from stockapp.crawler import wantgoo
+from stockapp.crawler import fubon_new
 from stockapp import leaderboard
 
 urlpatterns = [
-    path('crawler/institutional_investors/<str:code>/<str:end_date>/', wantgoo.read_institutional_investors),
-    path('crawler/count/institutional_investors/<str:code>/<str:end_date>/', wantgoo.count_read_institutional_investors),
+    path('crawler/institutional_investors/<str:code>/<str:end_date>/', fubon_new.read_institutional_investors),
+    path('crawler/count/institutional_investors/<str:code>/<str:end_date>/', fubon_new.count_read_institutional_investors),
 
     path('broker-group/', broker_group.base),
     path('broker-group/create/', broker_group.create),

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 import pandas as pd
 import threading
-from stockapp.crawler.wantgoo import CountContinuous
+from stockapp.crawler.fubon_new import CountContinuous
 
 import time
 
@@ -248,11 +248,9 @@ def count_historical_daily_candlesticks(df, days):
     return round(df['close'].mean(), 2)
     
 def read_historical_daily_candlesticks(df, stock):
-    df = df.reset_index()
-
+    # df = df.reset_index()
     yesterday_close = df[df.index == 1]['close'].values[0]
     close = df[df.index == 0]['close'].values[0]
-    
     stock.close = round(close, 2)
     stock.changeRate = round((close - yesterday_close) / yesterday_close * 100, 2)
     

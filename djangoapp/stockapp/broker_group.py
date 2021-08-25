@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from stockapp import models
 from stockapp.crawler.fubon import NameToID, CrawlerList, ListtoExcel
-from stockapp.crawler import wantgoo
+from stockapp.crawler import fubon_new
 
 from django.utils.encoding import escape_uri_path
 
@@ -86,7 +86,11 @@ def upload(request, group_id):
 @login_required
 def sync(request, group_id):
     
-    wantgoo.sync()
+    print("三大法人買賣超")
+    fubon_new.sync_institutional_investors()
+    
+    print("趨勢分析")
+    fubon_new.sync_historical_daily_candlesticks()
     
     return JsonResponse([], safe=False)
 
