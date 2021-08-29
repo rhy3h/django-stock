@@ -151,7 +151,7 @@ def index(request, code):
             'low'   : 'numeral',
             'close' : 'numeral',
         },
-        mode='vline'
+        mode = 'vline'
     )
     p1 = figure(
         title = f'{full_code_name} K線圖',
@@ -201,7 +201,7 @@ def index(request, code):
     ma_legend_items = []
     for ma_name, color in zip(['MA5', 'MA10', 'MA20', 'MA60', 'MA120', 'MA240'], Dark2[6]):
         ma_df = df[['date', 'close', 'open', 'high', 'low', 'volume', ma_name]]
-        
+
         source = ColumnDataSource(ma_df)
         ma_line = p1.line(
             x = 'index',
