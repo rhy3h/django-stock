@@ -34,5 +34,4 @@ urlpatterns = [
     path('stock/<int:code>/', stock.index),
     path('stock/<int:code>/add', stock.add),
     path('stock/<int:code>/delete', stock.delete),
-    path('stock/<int:code>/backtesting', stock.backtesting),
 ]
