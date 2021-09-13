@@ -6,6 +6,12 @@ from stockapp import broker_group, leaderboard, stock_group, stock
 from stockapp.crawler import fubon_new
 from stockapp import leaderboard
 
+from rest_framework.routers import DefaultRouter
+from stockapp import views
+
+router = DefaultRouter()
+router.register(r'BrokerGroup', views.BrokerViewSet)
+
 urlpatterns = [
     path('crawler/institutional_investors/<str:code>/<str:end_date>/', fubon_new.read_institutional_investors),
     path('crawler/count/institutional_investors/<str:code>/<str:end_date>/', fubon_new.count_read_institutional_investors),
@@ -28,10 +34,14 @@ urlpatterns = [
     path('stock-group/<int:group_id>/add', stock_group.add),
     path('stock-group/<int:group_id>/edit', stock_group.edit),
     path('stock-group/<int:group_id>/delete', stock_group.delete),
+    path('stock-group/<int:group_id>/upload', stock_group.upload),
     path('stock-group/<int:group_id>/delete/<int:stock_item_id>', stock_group.delete_item),
 
     path('stock/', stock.base),
     path('stock/<int:code>/', stock.index),
     path('stock/<int:code>/add', stock.add),
     path('stock/<int:code>/delete', stock.delete),
+
+    url(r'^api/', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

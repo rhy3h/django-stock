@@ -1,42 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
-from stockapp import models
-
 import pandas as pd
 
 from datetime import date, datetime, timedelta
 
+from stockapp import models
 from stockapp.crawler import esun
 
-from backtesting import Backtest, Strategy
+from backtesting import Strategy
 from backtesting.lib import crossover
-
 from backtesting.test import SMA
-
-from django.http import HttpResponse, JsonResponse
-
-from django.utils.encoding import escape_uri_path
-
-import backtesting
 
 from bokeh.plotting import figure
 from bokeh.embed import components
-
-from bokeh.plotting import figure
-
-from bokeh.models import ColumnDataSource, HoverTool
-from bokeh.models import Legend
-
-from bokeh.palettes import Dark2
-
-from bokeh.models import Legend
-
-from bokeh.palettes import Spectral4, Dark2
-from bokeh.models import ColumnDataSource, BoxAnnotation
-from bokeh.models import RangeSlider
+from bokeh.models import ColumnDataSource, HoverTool, BoxAnnotation, RangeSlider, Legend
 from bokeh.layouts import layout, row, Spacer
-
 from bokeh.models.callbacks import CustomJS
 
 @login_required
@@ -199,7 +178,8 @@ def index(request, code):
     p1.hover.renderers = [vbar1, vbar2]
 
     ma_legend_items = []
-    for ma_name, color in zip(['MA5', 'MA10', 'MA20', 'MA60', 'MA120', 'MA240'], Dark2[6]):
+    color = ('#4286F5', '#FEBD09', '#E65596', '#83BF0A', '#834BEB', '#FC7742')
+    for ma_name, color in zip(['MA5', 'MA10', 'MA20', 'MA60', 'MA120', 'MA240'], color):
         ma_df = df[['date', 'close', 'open', 'high', 'low', 'volume', ma_name]]
 
         source = ColumnDataSource(ma_df)

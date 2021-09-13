@@ -135,7 +135,7 @@ def index(request, group_id):
     broker_group = broker_group_list.get(
         id = group_id
     )
-    title = '群組 ' + broker_group.Name
+    title = f'券商群組 {broker_group.Name}'
     broker_list = models.BrokerGroupItem.objects.filter(
         BrokerGroup = broker_group
     )

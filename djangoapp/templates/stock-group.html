@@ -63,7 +63,7 @@
 			</li>
 			{% for group in stock_group_list %}
 			<li class="nav-item">
-				<a href="/stock-group/{{ group.id }}" class="nav-link">
+				<a href="/stock-group/{{ group.id }}/?index=0" class="nav-link">
 				<i class="far fa-circle nav-icon"></i>
 				<p>{{ group.Name }}</p>
 				</a>
@@ -104,20 +104,21 @@
 				</div><!-- /.col -->
 			</div><!-- /.row -->
 			<h3 class="h3 pt-3">股票清單
-				<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add-stock-modal">
-					新增股票
-				</button>
+				<a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#upload">
+				上傳
+				</a>
 			</h3>
-			<div id="stock-list" class="row pt-3 border-bottom">
+			<div id="stock-list" class="row border-bottom">
 				{% for item in stock_group_item_list %}
-				<h6 class="fs-4 col-xxl-2 col-xl-3 col-lg-4 col-sm-6 d-flex justify-content-between align-items-center">
-					<span class="fs-5">{{ item.Code }} {{ item.Name }}</span>
-					<span class="fs-5">
-						<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-stock">
-						刪除
-						</a>
-					</span>
-				</h6>
+					{% if item.Code == code %}
+					<h6 class="fs-4 col-xxl-2 col-xl-4 col-lg-4 col-sm-6 d-flex justify-content-center align-items-center text-primary">
+						<span class="fs-5">{{ item.Name }}</span>
+					</h6>
+					{% else %}
+					<h6 class="fs-4 col-xxl-2 col-xl-4 col-lg-4 col-sm-6 d-flex justify-content-center align-items-center">
+						<span class="fs-5">{{ item.Name }}</span>
+					</h6>
+					{% endif %}
 				{% endfor %}
 			</div>
 		</div><!-- /.container-fluid -->
@@ -127,28 +128,9 @@
 	<div class="content">
 		<div class="container-fluid">
 			<div class="row pt-3 ">
-				<div class="col-lg-12" id="positive">
+				<div class="col-lg-12">
 					<div class="card">
-						<div class="card-header text-primary">
-						股票
-						</div>
-						<div class="card-body">
-							<table class="table table-bordered table-striped" id="positive-table" style="width:100%">
-								<thead>
-								<tr>
-									{% for col in columns %}
-									<th>123</th>
-									{% endfor %}
-								</tr>
-								</thead>
-								<tbody>
-								{% for stock in stock_table.positive %}
-								<tr>
-								</tr>
-								{% endfor %}
-								</tbody>
-							</table>
-						</div>
+						{{div | safe}}
 					</div>		
 					<!-- /.card -->
 				</div>
@@ -254,28 +236,32 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="add-stock-modal" tabindex="-1" aria-labelledby="add-stock-modal" aria-hidden="true">
+
+<div class="modal fade" id="upload" tabindex="-1" aria-labelledby="upload" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title">股票</h5>
+				<h5 class="modal-title">上傳券商清單</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			  </div>
+			</div>
 			<div class="modal-body">
-				<form class="needs-validation" method="POST" action="add" autocomplete="off">
+				<p>Excel 格式:</p>
+				<p>代號 | 名稱</p>
+				<p>p.s. 自動將舊的股票全都刪除</p>
+				<form enctype="multipart/form-data"  class="needs-validation" method="POST" action="upload">
 				{% csrf_token %}
-					<div class="row">
-						<div class="mb-3">
-							<label for="stock-input" class="col-form-label">股票清單：</label>
-							<input type="text" class="form-control" id="stock-input" name="stock-input" autocomplete="off">
-						</div>
+				<div class="form-floating mb-3">
+					<div class="mb-3">
+					<label for="upload" class="form-label" >上傳檔案</label>
+					<input class="form-control" type="file" accept=".xlsx" id="uploadfile" name="uploadfile" required>
 					</div>
-					<button type="submit" id="add-stock-submit" hidden>Continue to checkout</button>
+				</div>
+				<button type="submit" id="upload-submit" hidden>Continue to checkout</button>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('add-stock-submit').click()">
-					確認
+				<button type="button" class="btn btn-outline-primary" onclick="document.getElementById('upload-submit').click()">
+				上傳
 				</button>
 			</div>
 		</div>
@@ -284,6 +270,11 @@
 {% endblock modal %}
 
 {% block script %}
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.2.min.js"></script>
+{{script | safe}}
 <script>
 	$('#add-stock-modal').on('hidden.bs.modal', function () {
 		$(this).find('form').trigger('reset');
@@ -297,114 +288,31 @@
 			$(this).addClass('active');
 		}
 	});
-	function autocomplete(inp, arr) {
-			/*the autocomplete function takes two arguments,
-			the text field element and an array of possible autocompleted values:*/
-			var currentFocus;
-			/*execute a function when someone writes in the text field:*/
-			inp.addEventListener("input", function(e) {
-				var a, b, i, val = this.value;
-				/*close any already open lists of autocompleted values*/
-				closeAllLists();
-				if (!val) {
-					return false;
-				}
-				currentFocus = -1;
-				/*create a DIV element that will contain the items (values):*/
-				a = document.createElement("DIV");
-				a.setAttribute("id", this.id + "autocomplete-list");
-				a.setAttribute("class", "autocomplete-items");
-				a.setAttribute("style", "height:300px;overflow-y:auto");
-				
-				/*append the DIV element as a child of the autocomplete container:*/
-				this.parentNode.appendChild(a);
-				/*for each item in the array...*/
-				for (i = 0; i < arr.length; i++) {
-					/*check if the item starts with the same letters as the text field value:*/
-                    if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-                        /*create a DIV element for each matching element:*/
-                        b = document.createElement("DIV");
-                        /*make the matching letters bold:*/
-                        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-                        b.innerHTML += arr[i].substr(val.length);
-                        /*insert a input field that will hold the current array item's value:*/
-                        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-                        /*execute a function when someone clicks on the item value (DIV element):*/
-                        b.addEventListener("click", function (e) {
-                            /*insert the value for the autocomplete text field:*/
-                            inp.value = this.getElementsByTagName("input")[0].value;
-                            /*close the list of autocompleted values,
-                            (or any other open lists of autocompleted values:*/
-                            closeAllLists();
-                        });
-                        a.appendChild(b);
-                    }
-				}
-			});
-			/*execute a function presses a key on the keyboard:*/
-			inp.addEventListener("keydown", function(e) {
-				var x = document.getElementById(this.id + "autocomplete-list");
-				if (x)
-					x = x.getElementsByTagName("div");
-				if (e.keyCode == 40) {
-					/*If the arrow DOWN key is pressed,
-					increase the currentFocus variable:*/
-					currentFocus++;
-					/*and and make the current item more visible:*/
-					addActive(x);
-				} else if (e.keyCode == 38) { //up
-					/*If the arrow UP key is pressed,
-					decrease the currentFocus variable:*/
-					currentFocus--;
-					/*and and make the current item more visible:*/
-					addActive(x);
-				} else if (e.keyCode == 13) {
-					/*If the ENTER key is pressed, prevent the form from being submitted,*/
-					e.preventDefault();
-					if (currentFocus > -1) {
-						/*and simulate a click on the "active" item:*/
-						if (x) {
-							x[currentFocus].click();
-							document.getElementById('add-stock-submit').click();
-						}
-					}
-				}
-			});
-			function addActive(x) {
-				/*a function to classify an item as "active":*/
-				if (!x) return false;
-				/*start by removing the "active" class on all items:*/
-				removeActive(x);
-				if (currentFocus >= x.length) currentFocus = 0;
-				if (currentFocus < 0) currentFocus = (x.length - 1);
-				/*add class "autocomplete-active":*/
-				x[currentFocus].classList.add("autocomplete-active");
+	document.onkeyup = checkKey;
+
+	function checkKey(e) {
+
+		e = e || window.event;
+
+		if (e.keyCode == '37') { // left arrow
+			let url = window.location.href;
+			let para = url.split("/");
+			let index = para[para.length - 1].split("=");
+			let new_index = parseInt(index[index.length - 1]) - 1;
+			if(new_index >= 0) {
+				window.location.replace('/stock-group/{{ stock_group.id }}/?index=' + new_index);
 			}
-			function removeActive(x) {
-				/*a function to remove the "active" class from all autocomplete items:*/
-				for (var i = 0; i < x.length; i++) {
-					x[i].classList.remove("autocomplete-active");
-				}
-			}
-			function closeAllLists(elmnt) {
-				/*close all autocomplete lists in the document,
-				except the one passed as an argument:*/
-				var x = document.getElementsByClassName("autocomplete-items");
-				for (var i = 0; i < x.length; i++) {
-					if (elmnt != x[i] && elmnt != inp) {
-						x[i].parentNode.removeChild(x[i]);
-					}
-				}
-			}
-			/*execute a function when someone clicks in the document:*/
-			document.addEventListener("click", function (e) {
-				closeAllLists(e.target);
-			});
 		}
-		
-		/*An array containing all the country names in the world:*/
-		var stock_list = {{ default_stock_list | safe }};
-		/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
-		autocomplete(document.getElementById("stock-input"), stock_list);
+		if (e.keyCode == '39') { // right arrow
+			let url = window.location.href;
+			let para = url.split("/");
+			let index = para[para.length - 1].split("=");
+			let new_index = parseInt(index[index.length - 1]) + 1;
+			
+			if(new_index < {{ max_length }}) {
+				window.location.replace('/stock-group/{{ stock_group.id }}/?index=' + new_index);
+			}
+		}
+	}
 </script>
 {% endblock script %}
