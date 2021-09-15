@@ -238,13 +238,13 @@ def index(request, group_id):
         name = stock_group_item_list[index].Name
         script, div = generate_graph(code, name)
         
-        if max_length > 3:
+        if max_length > 6:
             if index == 0:
-                stock_group_item_list = stock_group_item_list[0:3]
+                stock_group_item_list = stock_group_item_list[0:6]
             elif index == max_length - 1:
                 stock_group_item_list = stock_group_item_list[max_length-3:max_length]
             else:
-                stock_group_item_list = stock_group_item_list[index-1:index + 2]
+                stock_group_item_list = stock_group_item_list[index-2:index+3]
     except:
         pass
             
@@ -255,8 +255,10 @@ def create(request):
     if request.method == "POST":
         stock_group_list_name = request.POST['stock-group-name']
         User = request.user
-        models.StockGroup.objects.get_or_create(Owner = User,
-                                Name = stock_group_list_name)
+        models.StockGroup.objects.get_or_create(
+            Owner = User,
+            Name = stock_group_list_name
+        )
         stock_group_list = models.StockGroup.objects.filter(Owner=User).last()
 
         return redirect('/stock-group/' + str(stock_group_list.id))
@@ -277,7 +279,7 @@ def add(request, group_id):
             Name = name,
         )
     
-        return redirect('/stock-group/' + str(group_id))
+        return redirect('/stock-group/' + str(group_id) + '/?index=0')
 
 @login_required
 def edit(request, group_id):
@@ -296,8 +298,10 @@ def edit(request, group_id):
 @login_required
 def delete(request, group_id):
     User = request.user
-    stock_group_list = models.StockGroup.objects.get(Owner = User,
-                        id = group_id)
+    stock_group_list = models.StockGroup.objects.get(
+        Owner = User,
+        id = group_id
+    )
     stock_group_list.delete()
 
     return redirect('/stock-group/')
@@ -321,7 +325,7 @@ def upload(request, group_id):
 
         df = pd.read_excel(uploadfile)
         for i in df.index: 
-            code = df['代號'][i]
+            code = df['代碼'][i]
             name = df['名稱'][i]
             models.StockGroupItem.objects.get_or_create(
                 StockGroup = stock_group,
@@ -332,4 +336,9 @@ def upload(request, group_id):
     return redirect('/stock-group/' + str(group_id) + '/?index=0')
 
 def delete_item(request, group_id, stock_item_id):
-    return redirect('/stock-group/' + str(group_id))
+    User = request.user
+    StockGroupItem = models.StockGroupItem.objects.get(
+        id = stock_item_id
+    )
+    StockGroupItem.delete()
+    return redirect('/stock-group/' + str(group_id) + '/?index=0')
