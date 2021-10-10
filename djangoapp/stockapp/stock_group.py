@@ -243,8 +243,10 @@ def index(request, group_id):
                 stock_group_item_list = stock_group_item_list[0:6]
             elif index == max_length - 1:
                 stock_group_item_list = stock_group_item_list[max_length-3:max_length]
+            elif index == 1:
+                stock_group_item_list = stock_group_item_list[index-1:index+5]
             else:
-                stock_group_item_list = stock_group_item_list[index-2:index+3]
+                stock_group_item_list = stock_group_item_list[index-2:index+4]
     except:
         pass
             
@@ -326,7 +328,7 @@ def upload(request, group_id):
         df = pd.read_excel(uploadfile)
         for i in df.index: 
             code = df['代碼'][i]
-            name = df['名稱'][i]
+            name = df['股票'][i]
             models.StockGroupItem.objects.get_or_create(
                 StockGroup = stock_group,
                 Code = code,
