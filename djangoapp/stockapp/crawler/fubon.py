@@ -343,7 +343,7 @@ def CrawlerList(broker_branch, begin_date, end_date):
     stock_table['positive'].sort()
     stock_table['negative'].sort(reverse=True)
 
-    with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5',  mode='r') as newstore:
+    with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5', mode='r') as newstore:
         i = 0
         count = 1
         length = len(stock_table['positive']) + len(stock_table['negative'])
@@ -372,7 +372,7 @@ def CrawlerList(broker_branch, begin_date, end_date):
 
             i += 1
     print()
-    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5',  mode='r') as newstore:
+    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5', mode='r') as newstore:
         i = 0
         count = 1
         length = len(stock_table['positive']) + len(stock_table['negative'])

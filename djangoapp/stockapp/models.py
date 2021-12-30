@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date
+
+class SyncModel(models.Model):
+    Date = models.DateField(default=date.today)
 
 class StockModel(models.Model):
     Owner = models.ForeignKey(User, on_delete=models.CASCADE)

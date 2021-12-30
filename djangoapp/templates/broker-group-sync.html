@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block modal %}
+<div class="modal fade" id="crawler-modal" tabindex="-1" aria-labelledby="crawler-modal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header h1 d-flex justify-content-center">
+				爬蟲進行中
+			</div>
+			<div class="modal-body h5 d-flex justify-content-center">
+				<div class="spinner-border" role="status">
+				<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock modal %}
+
+{% block script %}
+<script src="{% static 'js/datatable-custom.js' %}"></script>
+<script>
+	function Crawler_GoodInfo(){
+		$("#crawler-modal").modal('show');
+
+		$.ajax({
+			url: 'sync-new',
+			data: {
+			},
+			dataType: 'json',
+			success: function (data) {
+				$("#crawler-modal .modal-header").text("爬蟲完畢");
+				$("#crawler-modal .modal-body").empty();
+				$("#crawler-modal .modal-body").text("三秒後重整");
+				setTimeout(function(){  window.location = "/broker-group" }, 3000);
+			}
+		});
+	}
+	
+	$(document).ready( function () {
+		Crawler_GoodInfo();
+	});	
+</script>
+{% endblock script %}

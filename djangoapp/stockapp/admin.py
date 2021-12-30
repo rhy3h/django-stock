@@ -3,6 +3,8 @@ from stockapp.models import *
 
 # Register your models here.
 
+admin.site.register(SyncModel)
+
 admin.site.register(StockModel)
 
 admin.site.register(BrokerGroup)

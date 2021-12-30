@@ -83,15 +83,40 @@ def upload(request, group_id):
     
     return redirect('/broker-group/' + str(group_id))
 
+from datetime import date
+
+def sync_base(request):
+    title = "自動爬蟲"
+    return render(request, 'broker-group-sync.html', locals())
+
+@login_required
+def sync_new(request):
+    try:
+        models.SyncModel.objects.get(Date = date.today().strftime('%Y-%m-%d'))
+    except:
+        print("三大法人買賣超")
+        fubon_new.sync_institutional_investors()
+        
+        print("趨勢分析")
+        fubon_new.sync_historical_daily_candlesticks()
+        
+        models.SyncModel.objects.create()
+
+    return JsonResponse([], safe=False)
+
 @login_required
 def sync(request, group_id):
-    
-    print("三大法人買賣超")
-    fubon_new.sync_institutional_investors()
-    
-    print("趨勢分析")
-    fubon_new.sync_historical_daily_candlesticks()
-    
+    try:
+        models.SyncModel.objects.get(Date = date.today().strftime('%Y-%m-%d'))
+    except:
+        print("三大法人買賣超")
+        fubon_new.sync_institutional_investors()
+        
+        print("趨勢分析")
+        fubon_new.sync_historical_daily_candlesticks()
+        
+        models.SyncModel.objects.create()
+
     return JsonResponse([], safe=False)
 
 @login_required

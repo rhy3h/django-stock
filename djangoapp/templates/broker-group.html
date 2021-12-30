@@ -76,9 +76,9 @@
 						下載
 						</a>
 						{% endif %}
-						<a href="javascript:Crawler_GoodInfo()" class="btn btn-outline-warning">
+						<!-- <a href="javascript:Crawler_GoodInfo()" class="btn btn-outline-warning">
 						同步
-						</a>
+						</a> -->
 					</h1>
 				</div>
 				<div class="col-sm-4 d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center">
@@ -367,21 +367,6 @@
 		</div>
 	</div>
 </div>
-
-<div class="modal fade" id="crawler-modal" tabindex="-1" aria-labelledby="crawler-modal" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header h1 d-flex justify-content-center">
-				爬蟲進行中
-			</div>
-			<div class="modal-body h5 d-flex justify-content-center">
-				<div class="spinner-border" role="status">
-				<span class="visually-hidden">Loading...</span>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
 {% endblock modal %}
 
 {% block script %}
@@ -458,23 +443,6 @@
 		}); 
 	}
 	
-	function Crawler_GoodInfo(){
-		$("#crawler-modal").modal('show');
-
-		$.ajax({
-			url: 'sync/',
-			data: {
-			},
-			dataType: 'json',
-			success: function (data) {
-				$("#crawler-modal .modal-header").text("爬蟲完畢");
-				$("#crawler-modal .modal-body").empty();
-				$("#crawler-modal .modal-body").text("三秒後重整");
-				setTimeout(function(){ location.reload() }, 3000);
-			}
-		});
-	}
-
 	function download(){
 		location.href = 'download?filename={{ save_file_name }}';
 	}
