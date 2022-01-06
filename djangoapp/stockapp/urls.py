@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.conf.urls import url
 
-from stockapp import broker_group, leaderboard, stock_group, stock
+from stockapp import broker_group, leaderboard, stock_group, stock, rank
 
 from stockapp.crawler import fubon_new
 from stockapp import leaderboard
@@ -38,5 +38,9 @@ urlpatterns = [
     path('stock/<int:code>/', stock.index),
     path('stock/<int:code>/add', stock.add),
     path('stock/<int:code>/delete', stock.delete),
+
+    path('rank/trading-volume', rank.trading_volume),
+    path('rank/trading-amount', rank.trading_amount),
+    path('rank/intersection', rank.intersection),
 
 ]

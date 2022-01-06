@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block mystyle %}
+{% endblock mystyle %}
+
+{% block sidebar %}
+<div class="sidebar">
+    <!-- Sidebar user (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+        <img src="{% static 'img/wallet.png' %}" alt="" class="brand-image" style="opacity: .8">
+        </div>
+        <div class="info">
+        <a class="d-block">{{ User }}</a>
+        </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+        <ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+</div>
+<!-- /.sidebar -->
+
+<div class="sidebar-custom">
+    <a href="#positive"class="btn btn-secondary hide-on-collapse">買入</a>
+    <a href="#negative" class="btn btn-secondary hide-on-collapse pos-right">賣出</a>
+</div>
+<!-- /.sidebar-custom -->
+{% endblock sidebar %}
+
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12 d-flex justify-content-center flex-wrap flex-md-nowrap align-items-center">
+                    <h1 class="h2">市場面之成交量選股法</h1>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-10" id="positive">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered table-striped" id="leader-buyin-table" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>代碼</th>
+                                    <th>名稱</th>
+                                    <th>量增率</th>
+                                    <th>成交量(張)</th>
+                                    <th>五日均量(張)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for stock in rank_list %}
+                                <tr>
+                                    <td>{{ stock.code }}</td>
+                                    <td>{{ stock.name }}</td>
+                                    <td>{{ stock.volumeIncreaseRate }}</td>
+                                    <td>{{ stock.volume }}</td>
+                                    <td>{{ stock.avg5dayVolume }}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col-md-6 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </div>
+</div>
+<!-- /.content-wrapper -->
+{% endblock content %}
+
+{% block script %}
+<script src="{% static 'js/datatable-custom.js' %}"></script>
+<script>
+</script>
+{% endblock script %}

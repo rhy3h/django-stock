@@ -342,66 +342,69 @@ def CrawlerList(broker_branch, begin_date, end_date):
     
     stock_table['positive'].sort()
     stock_table['negative'].sort(reverse=True)
-
-    with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5', mode='r') as newstore:
-        i = 0
-        count = 1
-        length = len(stock_table['positive']) + len(stock_table['negative'])
-
-        while i < len(stock_table['positive']):
-            try:
-                df_restored = newstore.select('code' + stock_table['positive'][i].code)
-                read_institutional_investors(df_restored, stock_table['positive'][i], end_date)
-            except:
-                pass
-            
-            progress_bar("彙整中: ", count, length)
-            count += 1
-            i += 1
-        
-        i = 0
-        while i < len(stock_table['negative']):
-            try:
-                df_restored = newstore.select('code' + stock_table['negative'][i].code)
-                read_institutional_investors(df_restored, stock_table['negative'][i], end_date)
-            except:
-                pass
-
-            progress_bar("彙整中: ", count, length)
-            count += 1
-
-            i += 1
-    print()
-    with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5', mode='r') as newstore:
-        i = 0
-        count = 1
-        length = len(stock_table['positive']) + len(stock_table['negative'])
-        
-        while i < len(stock_table['positive']):
-            try:
-                df_restored = newstore.select('code' + stock_table['positive'][i].code)
-                read_historical_daily_candlesticks(df_restored, stock_table['positive'][i])
-            except:
-                pass
-            
-            progress_bar("彙整中: ", count, length)
-            count += 1
-            i += 1
-        
-        i = 0
-        while i < len(stock_table['negative']):
-            try:
-                df_restored = newstore.select('code' + stock_table['negative'][i].code)
-                read_historical_daily_candlesticks(df_restored, stock_table['negative'][i])
-            except:
-                pass
-
-            progress_bar("彙整中: ", count, length)
-            count += 1
-
-            i += 1
     
-    end = time.time()
-    print(f"\n彙整時間: {round(end - start, 2)} 秒")
+    try:
+        with pd.HDFStore('djangoapp/stockapp/files/institutional-investors.h5', mode='r') as newstore:
+            i = 0
+            count = 1
+            length = len(stock_table['positive']) + len(stock_table['negative'])
 
+            while i < len(stock_table['positive']):
+                try:
+                    df_restored = newstore.select('code' + stock_table['positive'][i].code)
+                    read_institutional_investors(df_restored, stock_table['positive'][i], end_date)
+                except:
+                    pass
+                
+                progress_bar("彙整中: ", count, length)
+                count += 1
+                i += 1
+            
+            i = 0
+            while i < len(stock_table['negative']):
+                try:
+                    df_restored = newstore.select('code' + stock_table['negative'][i].code)
+                    read_institutional_investors(df_restored, stock_table['negative'][i], end_date)
+                except:
+                    pass
+
+                progress_bar("彙整中: ", count, length)
+                count += 1
+
+                i += 1
+        print()
+        with pd.HDFStore('djangoapp/stockapp/files/historical-daily-candlesticks.h5', mode='r') as newstore:
+            i = 0
+            count = 1
+            length = len(stock_table['positive']) + len(stock_table['negative'])
+            
+            while i < len(stock_table['positive']):
+                try:
+                    df_restored = newstore.select('code' + stock_table['positive'][i].code)
+                    read_historical_daily_candlesticks(df_restored, stock_table['positive'][i])
+                except:
+                    pass
+                
+                progress_bar("彙整中: ", count, length)
+                count += 1
+                i += 1
+            
+            i = 0
+            while i < len(stock_table['negative']):
+                try:
+                    df_restored = newstore.select('code' + stock_table['negative'][i].code)
+                    read_historical_daily_candlesticks(df_restored, stock_table['negative'][i])
+                except:
+                    pass
+
+                progress_bar("彙整中: ", count, length)
+                count += 1
+
+                i += 1
+    
+        end = time.time()
+        print(f"\n彙整時間: {round(end - start, 2)} 秒")
+    except:
+        pass
+    
     return stock_table

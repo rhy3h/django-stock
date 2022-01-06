@@ -2,7 +2,7 @@ Django==2.2.3
 requests
 beautifulsoup4==4.9.3
 pandas==1.2.4
-bokeh
+bokeh==2.3.2
 Backtesting
 openpyxl
 tables

@@ -101,7 +101,7 @@ def index(request, code):
     df['MA10']  = df['close'].rolling(10).mean()
     df['MA20']  = df['close'].rolling(20).mean()
     df['MA60']  = df['close'].rolling(60).mean()
-    df['MA120'] = df['close'].rolling(120).mean()
+    df['MA100'] = df['close'].rolling(100).mean()
     df['MA240'] = df['close'].rolling(240).mean()
     inc = df.close > df.open
     dec = df.open > df.close
@@ -179,7 +179,7 @@ def index(request, code):
 
     ma_legend_items = []
     color = ('#4286F5', '#FEBD09', '#E65596', '#83BF0A', '#834BEB', '#FC7742')
-    for ma_name, color in zip(['MA5', 'MA10', 'MA20', 'MA60', 'MA120', 'MA240'], color):
+    for ma_name, color in zip(['MA5', 'MA10', 'MA20', 'MA60', 'MA100', 'MA240'], color):
         ma_df = df[['date', 'close', 'open', 'high', 'low', 'volume', ma_name]]
 
         source = ColumnDataSource(ma_df)
