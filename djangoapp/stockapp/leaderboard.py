@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect
 
 from django.utils.encoding import escape_uri_path
 
 import pandas as pd
+
+from stockapp import models
 
 from itertools import groupby
 
@@ -175,7 +178,7 @@ def download(request):
 def index(request):
     User = request.user
     title = "排行榜"
-    
+
     file_name = []
     
     buyin_list = []

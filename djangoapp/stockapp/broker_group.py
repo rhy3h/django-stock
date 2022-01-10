@@ -11,7 +11,6 @@ from django.utils.encoding import escape_uri_path
 from datetime import date, datetime, timedelta
 import pandas as pd
 
-
 @login_required
 def base(request):
     User = request.user
@@ -34,7 +33,7 @@ def create(request):
             Name = new_group_name
         )
         broker_group = models.BrokerGroup.objects.filter(
-            Owner=User
+            Owner = User
         ).last()
 
         return redirect('/broker-group/' + str(broker_group.id))

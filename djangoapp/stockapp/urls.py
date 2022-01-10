@@ -39,8 +39,7 @@ urlpatterns = [
     path('stock/<int:code>/add', stock.add),
     path('stock/<int:code>/delete', stock.delete),
 
+    path('rank/board', rank.base),
     path('rank/trading-volume', rank.trading_volume),
     path('rank/trading-amount', rank.trading_amount),
-    path('rank/intersection', rank.intersection),
-
 ]

@@ -10,16 +10,24 @@
 	<!-- Sidebar user (optional) -->
 	<div class="user-panel mt-3 pb-3 mb-3 d-flex">
 		<div class="image">
-		<img src="{% static 'img/wallet.png' %}" alt="" class="brand-image" style="opacity: .8">
+			<img src="{% static 'img/wallet.png' %}" alt="" class="brand-image" style="opacity: .8">
 		</div>
 		<div class="info">
-		<a class="d-block">{{ User }}</a>
+			<a class="d-block">{{ User }}</a>
 		</div>
 	</div>
 
 	<!-- Sidebar Menu -->
 	<nav class="mt-2">
-		<ul id="sidebar" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+		<ul id="sidebar"  class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+			{% for leader_group in leader_group_list %}
+			<li class="nav-item">
+				<a href="/leaderboard/{{ leader_group.id }}" class="nav-link">
+				<i class="far fa-circle nav-icon"></i>
+				<p>{{ leader_group.Date }}</p>
+				</a>
+			</li>
+			{% endfor %}
 		</ul>
 	</nav>
 	<!-- /.sidebar-menu -->

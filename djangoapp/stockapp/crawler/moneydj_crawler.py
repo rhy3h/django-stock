@@ -21,7 +21,6 @@ def crawler_trading_volume():
     for stock in table:
         item_split = stock[:-1].split('\n')
         code_name = re.findall(r'\d+|\D+', item_split[0])
-        
         tradingVolumeItem = ClsTradingVolume(
             code_name[0],
             code_name[1],
@@ -60,14 +59,30 @@ def crawler_listed_trading_amount(type, days):
     
     return rank_list
 
-class ClsStock:
-    def __init__(self, code, name, volumeIncreaseRate, volume, avg5dayVolume, dealAmount):
+class Stock:
+    def __init__(self, code, name):
         self.code = code
         self.name = name
-        self.volumeIncreaseRate = volumeIncreaseRate
-        self.volume = volume
-        self.avg5dayVolume = avg5dayVolume
-        self.dealAmount = dealAmount
+        self.days = None
+        self.date = []
+        self.sumForeign = None
+        self.sumING = None
+        self.sumDealer = None
+        self.capital = None
+        self.industry = None
+        self.status = None
+        self.five = None
+        self.ten = None
+        self.twenty = None
+        self.sixty = None
+        self.one_twenty = None
+        self.two_forty = None
+        self.close = None
+        self.changeRate = None
+        self.volumeIncreaseRate = None
+        self.volume = None
+        self.avg5dayVolume = None
+        self.dealAmount = None
 
 def crawler_intersection(type, days):
     rank_list = []
@@ -78,16 +93,40 @@ def crawler_intersection(type, days):
     for i in range(len(rank_amount_list)):
         for j in range(len(rank_volume_list)):
             if rank_amount_list[i].code == rank_volume_list[j].code:
-                rank_list.append(
-                    ClsStock(
-                        rank_volume_list[j].code,
-                        rank_volume_list[j].name,
-                        rank_volume_list[j].volumeIncreaseRate,
-                        rank_volume_list[j].volume,
-                        rank_volume_list[j].avg5dayVolume,
-                        rank_amount_list[i].dealAmount,
-                    )
+                stock = Stock(
+                    rank_volume_list[j].code,
+                    rank_volume_list[j].name,
                 )
+                stock.volumeIncreaseRate = rank_volume_list[j].volumeIncreaseRate
+                stock.volume = rank_volume_list[j].volume
+                stock.avg5dayVolume = rank_volume_list[j].avg5dayVolume
+                stock.dealAmount = rank_amount_list[i].dealAmount
+                rank_list.append(stock)
+                
+                break
+
+    return rank_list
+
+
+def crawler_union(type, days):
+    rank_list = []
+
+    rank_volume_list = crawler_trading_volume()
+    rank_amount_list = crawler_listed_trading_amount(type, days)
+    
+    for i in range(len(rank_amount_list)):
+        for j in range(len(rank_volume_list)):
+            if rank_amount_list[i].code == rank_volume_list[j].code:
+                stock = Stock(
+                    rank_volume_list[j].code,
+                    rank_volume_list[j].name,
+                )
+                stock.volumeIncreaseRate = rank_volume_list[j].volumeIncreaseRate
+                stock.volume = rank_volume_list[j].volume
+                stock.avg5dayVolume = rank_volume_list[j].avg5dayVolume
+                stock.dealAmount = rank_amount_list[i].dealAmount
+                rank_list.append(stock)
+                
                 break
 
     return rank_list
