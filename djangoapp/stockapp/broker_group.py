@@ -88,7 +88,6 @@ def sync_base(request):
     title = "自動爬蟲"
     return render(request, 'broker-group-sync.html', locals())
 
-@login_required
 def sync_new(request):
     try:
         models.SyncModel.objects.get(Date = date.today().strftime('%Y-%m-%d'))
