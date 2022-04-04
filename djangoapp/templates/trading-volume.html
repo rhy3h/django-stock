@@ -68,7 +68,7 @@
                                 {% for stock in rank_list %}
                                 <tr>
                                     <td>{{ stock.code }}</td>
-                                    <td>{{ stock.name }}</td>
+                                    <td><a href="/stock/{{ stock.code }}" target="_blank">{{ stock.name }}</a></td>
                                     <td>{{ stock.volumeIncreaseRate }}</td>
                                     <td>{{ stock.volume }}</td>
                                     <td>{{ stock.avg5dayVolume }}</td>

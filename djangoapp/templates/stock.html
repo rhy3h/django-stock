@@ -3,8 +3,8 @@
 {% load humanize %}
 
 {% block mystyle %}
-<link href="http://cdn.pydata.org/bokeh/release/bokeh-2.3.2.min.css" rel=”stylesheet” type="text/css">
-<link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.3.2.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.2.min.css" rel=”stylesheet” type="text/css">
+<link href="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.2.min.css" rel=”stylesheet” type="text/css">
 <style>
 	/*the container must be positioned relative:*/
 	.autocomplete {
@@ -91,44 +91,14 @@
 			{% if code %}
 			<div class="row py-3 border-bottom">
 				<div class="col-sm-6 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-					<h1 class="m-0">
-						{{ full_code_name }}
-						{% if get_stock %}
-						<a class="btn btn-outline-danger" href="delete">
-							刪除
-						</a>
-						{% else %}
-						<a class="btn btn-outline-primary" href="add">
-							新增
-						</a>
-						{% endif %}
-					</h1>
+					<h1 class="m-0">{{ full_code_name }}</h1>
 				</div><!-- /.col -->
-				<div class="col-sm-6 d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center">
-					<form method="POST" action="">
-						{% csrf_token %}
-						<div class="row">
-							<div class="col-sm-5 col-12">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">起始日</div>
-								<input class="form-control" id="begin-date" name="begin-date" type="date" value="{{ begin_date }}" min="2020-07-07" max="{{ today }}" onchange="sync_end_date()">
-							</div>
-							<div class="col-sm-5 col-12">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">結束日</div>
-								<input class="form-control" id="end-date" name="end-date" type="date" value="{{ end_date }}" min="2020-07-07" max="{{ today }}">
-							</div>
-							<div class="col-sm-2 col-12">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">搜尋</div>
-								<input class="btn btn-outline-primary" type="submit" value="搜尋" name="search">
-							</div>
-						</div>
-					</form>
-				</div>
 			</div><!-- /.row -->
 			
 			<div class="content">
 				<div class="container-fluid">
-					<div class="row pt-3 ">
-						<div class="col-12" id="positive">
+					<div class="row pt-3">
+						<div class="col-12">
 							{{div | safe}}
 						</div>
 					</div>
